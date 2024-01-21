@@ -1,54 +1,142 @@
+html, body{
+    width: 750px;
+    margin: 0;
+    padding:0;
+    background-image: url('images/image3.png');
+    background-size: 750px 630px;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-attachment: fixed, scroll;
+}
 .header {
+    position: fixed;
+    top: 0;
+    width: 750px;
     background-color: rgb(255, 255, 255);
-    padding: 10px;
     font-family: Arial, Helvetica, sans-serif;
-    display: flex;
-    justify-content: space-between;
-    white-space: nowrap;
+    font-size: 10px;
     list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1;
 }
 
 .mainevent {
-    text-align: center;
     display: flex;
-    color: black;
     justify-content: flex-start;
+    width: fit-content;
+    float: left;
+    padding: 25px 50px;
+
 }
 
 .mainevent a {
+    text-align: center;
     text-decoration: none;
-    color: rgb(135, 132, 76);
-    padding: 14px 16px;
-    font-size: 12px;
-    font-weight: normal;
+    color: rgb(180,156,95);
+    white-space: nowrap;
+    padding-left: 20px;
 }
 
 .nav {
-    text-align: center;
+    width: fit-content;
+    float: right;
     display: flex;
-    justify-content: flex-end;
+    padding: 25px;
 }
 
 .nav a {
-    text-decoration: none;
-    color: black;
     padding: 14px 16px;
-    font-size: 12px;
-    font-weight: normal;
+    color: black;
+    text-decoration: none;
+}
+
+.nav a:hover {
+    color: rgb(180,156,95);
 }
 
 .overlay-title {
+    text-align: center;
+    color: white;
+    padding-top: 20%;
+    padding-bottom: 20%;
+    font-size: 35px;
+    letter-spacing: 10px;
+    line-height: 1.5;
+}
+
+.image-container {
+    background-color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 50px 50px;
+}
+
+.flower {
+    width: 230px;
+    height: auto;
+}
+
+.couple {
+    width: 370px;
+    height: auto;
+    padding-left: 50px;
+}
+
+.flower-container {
+    position: relative;
+}
+
+.flower-title {
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Latha, sans-serif;
+    font-size: 20px;
+    letter-spacing: 5px;
     color: white;
     text-align: center;
-    height: 80%;
+    width: 65%;
+}
+
+.flower-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 11px;
+    color: white;
+    text-align: center;
+    letter-spacing: 2px;
+    line-height: 2.5;
+    width: 65%;
+    height: auto;
+}
+
+.discover {
+    position: absolute;
+    top: 80%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+    text-align: center;
+    width: 65%;
+    height: auto;
+    padding: 10px;
+    border: 1px solid white;
+}
+
+.quote-image {
+    background-color: white;
     display: flex;
+    align-items: center;
     justify-content: center;
-    align-items:flex-start;
-    padding-top: 15%;
-    background-size: cover;
-    background-position: center;
-    font-size: 45px;
-    letter-spacing: 15px;
-    line-height: 1.5;
-    
+    padding: 50px 50px;
 }

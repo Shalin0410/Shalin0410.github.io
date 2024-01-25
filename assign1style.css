@@ -1,7 +1,10 @@
 html, body{
-    width: 750px;
+    max-width: 750px;
+    min-width: 750px;
     margin: 0;
     padding:0;
+}
+.background-image {
     background-image: url('images/image3.png');
     background-size: 750px 630px;
     background-repeat: no-repeat;
@@ -9,7 +12,7 @@ html, body{
     background-attachment: fixed, scroll;
 }
 .header {
-    position: fixed;
+    background-position-x: fixed;
     top: 0;
     width: 750px;
     background-color: rgb(255, 255, 255);
@@ -138,4 +141,47 @@ html, body{
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.arrow-quote-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+}
+
+.quote {
+    width: 320px;
+    height: auto;
+    font-family: Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 18px;
+    text-align: center;
+    letter-spacing: 2px;
+    line-height: 1.5;
+}
+
+.arrow {
+    font-size: 30px;
+    color: rgb(180,156,95);
+    padding: 0 120px;
+}
+
+.author {
+    font-family: Helvetica, sans-serif;
+    font-weight: bold;
+    color: rgb(180,156,95);
+    font-size: 8px;
+    text-align: center;
+    padding: 10px 0px;
+    background-color: white;
+}
+
+.table-image {
+    background-image: url('images/image2.png');
+    max-width: 750px;
+    height: 630px;
+    background-size: 750px 630px;
+    background-repeat: no-repeat;
+    background-position: top left;
+    background-attachment: fixed, scroll;
 }

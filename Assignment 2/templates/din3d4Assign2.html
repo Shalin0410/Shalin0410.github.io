@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Assignment 2</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='assign2style.css') }}">
+</head>
+<body>
+    <div class="homepage-container">
+        <img src="static/img/back.svg" alt="Background Image" class="backgroundImage">
+        <div class="homepage-title">
+            <p>Stock Search</p>
+        </div>
+        <div class="homepage-search"> 
+            <form id="searchForm" class="stock-search-form" method="get" onsubmit="getStockData(event)"> 
+                <button type="submit" class="search-button">
+                    <svg xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512"  alt="Search Icon" class="search-icon">
+                        <path d="M505 442.7L405.3 343c-4.5-4.5-10.6-7-17-7H372c27.6-35.3 44-79.7 44-128C416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c48.3 0 92.7-16.4 128-44v16.3c0 6.4 2.5 12.5 7 17l99.7 99.7c9.4 9.4 24.6 9.4 33.9 0l28.3-28.3c9.4-9.4 9.4-24.6.1-34zM208 336c-70.7 0-128-57.3-128-128s57.3-128 128-128 128 57.3 128 128-57.3 128-128 128z"></path>
+                    </svg>
+                </button>
+                <input type="text" id="stockSearch" class="search-bar" name="search" placeholder="Enter Stock Ticker Symbol" required>
+                <button type="reset" class="clear-button">
+                    <svg xmlns="https://www.w3.org/2000/svg" viewBox="0 0 512 512" alt="Clear Icon" class="clear-icon">
+                        <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+        <div id="profileContainer" class="profile-container" style="display: none">
+            <div class="tab">
+                <button id="stock" class="profileInfo" onclick="openTab(event, 'stockProfile')">Company</button>
+                <button id="stockSummary" class="profileInfo" onclick="openTab(event, 'stockSummaryInfo')">Stock Summary</button>
+                <button id="charts" class="profileInfo" onclick="openTab(event, 'highCharts')">Charts</button>
+                <button id="news" class="profileInfo" onclick="openTab(event, 'stockLatestNews')">Latest News</button>
+            </div>
+            <div id="stockProfile" class="tabcontent" style="display: block">
+            </div>
+
+            <div id="stockSummaryInfo" class="tabcontent" style="display: none">
+            </div>
+
+            <div id="highCharts" class="tabcontent" style="display: none">
+                <div class="chartInfo">
+                    <img class="chartImage" src="static/img/AAPL.svg">
+                </div>
+            </div>
+
+            <div id="stockLatestNews" class="tabcontent" style="display: none">
+            </div>
+        
+        </div>
+        <div id="errorContainer" class="error-container" style="display: none">
+            <div id="errorMessage" class="error-message">Error: No record has been found, please enter a valid symbol</div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', filename='assignment_2.js') }}"></script>
+</body>
+</html>

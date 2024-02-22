@@ -11,7 +11,6 @@ function getStockData(event) {
 
     return fetchCompanyProfile(stock).then(function(companyProfile){
         if (companyProfile) {
-            console.log('Company Profile: ' + JSON.stringify(companyProfile));
             displayStockData(companyProfile);
             var stockSummaryPromise = fetchStockSummary(stock);
             var stockRecommendationPromise = fetchStockRecommendation(stock);
@@ -19,10 +18,6 @@ function getStockData(event) {
             var latestNewsPromise = fetchLatestNews(stock);
 
             Promise.all([stockSummaryPromise, stockRecommendationPromise, chartsPromise, latestNewsPromise]).then(function(results) {
-                console.log('Stock Summary: ' + JSON.stringify(results[0]));
-                console.log('Stock Recommendation: ' + JSON.stringify(results[1]));
-                console.log('Stock Charts: ' + JSON.stringify(results[2]));
-                console.log('Latest News: ' + JSON.stringify(results[3]));
 
                 window.stockData = {
                     companyProfile: companyProfile,
@@ -100,7 +95,6 @@ function fetchStockRecommendation(stock) {
 function fetchStockCharts(stock) {
     return fetch('/api/stock/charts?symbol=' + stock)
         .then(response => {
-            console.log('Response: ' + response.status);
             if (response.status === 500 ) {
                 throw new Error('Network response was not ok');
             }
@@ -248,7 +242,6 @@ async function displayStockCharts() {
         // Create the chart
         //stockData.charts.results.map(obj => [obj.t, obj.c])
         var data = stockData.charts.results.map(obj => [obj.t, obj.c, obj.v]);
-        console.log(data);
         const stockPriceArea = [],
         volume = [],
         dataLength = stockData.charts.results.length

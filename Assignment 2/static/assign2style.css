@@ -2,7 +2,6 @@
     margin: auto;
     max-width: 900px;
     font-family: "Roboto", sans-serif;
-    white-space: nowrap;
 }
 
 .backgroundImage {
@@ -120,6 +119,7 @@
     padding: 14px 16px;
     transition: 0.3s;
     font-size: 17px;
+    margin: 0 0 0 -4px;
 }
 
 /* Change background color of buttons on hover */
@@ -140,7 +140,7 @@
 }
 
 .stockImage img {
-    width: 15%;
+    width: 10%;
     padding-top: 25px;
     padding-bottom: 20px;
 }

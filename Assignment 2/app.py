@@ -18,12 +18,10 @@ def home():
 def get_stock_profile():
     stock = request.args.get('symbol', '').upper()
     response = requests.get(f'https://finnhub.io/api/v1/stock/profile2?symbol={stock}&token={API_KEY}')
-    print("HELLO")
     if response.status_code != 200:
         return jsonify(error=f'Error: {response.status_code}'), 500
     else:
         data = response.json()
-        print(data)
         if not data:
             return jsonify(error=f'Error: No record has been found, please enter a valid symbol'), 404
         
@@ -33,22 +31,25 @@ def get_stock_profile():
 def get_stock_summary():
     stock = request.args.get('symbol', '').upper()
     response = requests.get(f'https://finnhub.io/api/v1/quote?symbol={stock}&token={API_KEY}')
-    print("HELLO Stock Summary")
     if response.status_code != 200:
         return jsonify(error=f'Error: {response.status_code}'), 500
     else:
         data = response.json()
-        print(data)
         if not data:
             return jsonify(error=f'Error: No record has been found, please enter a valid symbol'), 404
         
         return jsonify(data)
     
 @app.route('/api/stock/charts', methods=['GET'])
-def get_stock_summary():
+def get_stock_charts():
     stock = request.args.get('symbol', '').upper()
-    response = requests.get(f'https://api.polygon.io/v2/aggs/ticker/AAPL/range/1/day/2023-01-09/2023-01-09?adjusted=true&sort=asc&apiKey=i5ppHPBsTV1OWhtbCpigMuLzc7MYn3F7')
-    print("HELLO Stock Summary")
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    print(current_date)
+    past_date = (datetime.now() - relativedelta(months=5, days=1)).strftime('%Y-%m-%d')
+    print(past_date)
+    response = requests.get(f'https://api.polygon.io/v2/aggs/ticker/{stock}/range/1/day/{past_date}/{current_date}?adjusted=true&sort=asc&apiKey=i5ppHPBsTV1OWhtbCpigMuLzc7MYn3F7')
+    print("HELLO Stock Charts")
+    print(response)
     if response.status_code != 200:
         return jsonify(error=f'Error: {response.status_code}'), 500
     else:
@@ -65,12 +66,10 @@ def get_stock_news():
     from_date = (datetime.now() + relativedelta(days=-30)).strftime('%Y-%m-%d')
     to_date = datetime.now().strftime('%Y-%m-%d')
     response = requests.get(f'https://finnhub.io/api/v1/company-news?symbol={stock}&from={from_date}&to={to_date}&token={API_KEY}')
-    print("HELLO Stock News")
     if response.status_code != 200:
         return jsonify(error=f'Error: {response.status_code}'), 500
     else:
         data = response.json()
-        print(data)
         if not data:
             return jsonify(error=f'Error: No news has been found'), 404
         

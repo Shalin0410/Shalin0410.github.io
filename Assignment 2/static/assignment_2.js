@@ -34,7 +34,7 @@ function getStockData(event) {
             });
 
             return {
-                companyProfile: companyProfile,
+                companyProfile: companyProfile
             };
         } else {
             return null;
@@ -45,7 +45,6 @@ function getStockData(event) {
 function fetchCompanyProfile(stock) {
     return fetch('/api/stock?symbol=' + stock)
         .then(response => {
-            console.log('Response: ' + response.status);
             if (response.status === 500 ) {
                 throw new Error('Network response was not ok');
             }
@@ -53,14 +52,12 @@ function fetchCompanyProfile(stock) {
         })
         .then(data => {
             if (data.error) {
-                console.log(data.error);
                 var errorContainer = document.getElementById('errorContainer');
                 errorContainer.style.display = 'block';
                 var profileContainer = document.getElementById('profileContainer');
                 profileContainer.style.display = 'none';
                 return null;
             } else {
-                //console.log('Data: ' + JSON.stringify(data)); // JSON.stringify(data) will convert the data object to a string
                 var errorContainer = document.getElementById('errorContainer');
                 errorContainer.style.display = 'none';
                 var profileContainer = document.getElementById('profileContainer');
@@ -73,7 +70,6 @@ function fetchCompanyProfile(stock) {
 function fetchStockSummary(stock) {
     return fetch('/api/stock/summary?symbol=' + stock)
         .then(response => {
-            console.log('Response: ' + response.status);
             if (response.status === 500 ) {
                 throw new Error('Network response was not ok');
             }
@@ -102,7 +98,6 @@ function fetchStockCharts(stock) {
 function fetchLatestNews(stock) {
     return fetch('/api/stock/news?symbol=' + stock)
         .then(response => {
-            console.log('Response: ' + response.status);
             if (response.status === 500 ) {
                 throw new Error('Network response was not ok');
             }
@@ -152,7 +147,6 @@ function displayStockData(stockData) {
 }
 
 function displayStockSummary() {
-    console.log('Inside Stock Summary: ' + JSON.stringify(stockData.stockSummary));
     var stockSummary = document.getElementById('stockSummaryInfo');
     var timestamp = stockData.stockSummary.t;
     var date = new Date(timestamp * 1000);
@@ -219,9 +213,11 @@ function displayStockSummary() {
     tabContents['stockSummaryInfo'] = stockSummary.innerHTML;
 }
 
-// function displayStockCharts(charts) {}
+function displayStockCharts() {
+    
+}
 
-function displayLatestNews(latestNews) {
+function displayLatestNews() {
     var stockLatestNews = document.getElementById('stockLatestNews');
     var news = stockData.latestNews.slice(0,5);
     var html = '';

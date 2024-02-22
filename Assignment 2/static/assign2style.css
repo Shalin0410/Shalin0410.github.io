@@ -2,6 +2,7 @@
     margin: auto;
     max-width: 900px;
     font-family: "Roboto", sans-serif;
+    white-space: nowrap;
 }
 
 .backgroundImage {
@@ -221,6 +222,10 @@
     font-weight: 500;
 }
 
+#highStockChart {
+    width: 90%;
+    height: 500px;
+}
 .error-container {
     position: fixed;
     left: 50%;

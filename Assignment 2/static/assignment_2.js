@@ -253,7 +253,7 @@ async function displayStockCharts() {
         volume = [],
         dataLength = stockData.charts.results.length
         date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
-
+        var minimumYaxis = Math.min(...data.map(obj => obj[1]));
     for (let i = 0; i < dataLength; i += 1) {
         stockPriceArea.push([
             data[i][0],
@@ -319,8 +319,9 @@ async function displayStockCharts() {
             title: {
                 text: 'Stock Price'
             },
+            min: minimumYaxis - 20,
+            height: '100%',
             opposite: false,
-            //height: '60%'
         }, {
             labels: {
                 formatter: function () {

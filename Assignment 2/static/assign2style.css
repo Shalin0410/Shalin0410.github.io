@@ -102,7 +102,7 @@
 
   /* Style the tab */
 .tab {
-    width: 90%;
+    width: 95%;
     background-color: #ededed;
     white-space: nowrap;
     margin-bottom: 15px;
@@ -193,7 +193,7 @@
 }
 
 .newsTable {
-    width: 90%;
+    width: 95%;
     border-collapse: collapse;
     border-spacing: 0 10px;
 }
@@ -223,8 +223,8 @@
 }
 
 #highStockChart {
-    width: 90%;
-    height: 500px;
+    width: 95%;
+    height: 550px;
 }
 .error-container {
     position: fixed;

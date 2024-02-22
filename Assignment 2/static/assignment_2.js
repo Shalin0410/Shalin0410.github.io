@@ -1,3 +1,11 @@
+window.onload = function() {
+    var stockSearch = document.getElementById('stockSearch');
+    stockSearch.value = '';
+    var errorContainer = document.getElementById('errorContainer');
+    errorContainer.style.display = 'none';
+    var profileContainer = document.getElementById('profileContainer');
+    profileContainer.style.display = 'none';
+};
 window.tabContents = {
     'stockProfile': "",
     'stockSummaryInfo': "",
@@ -234,19 +242,12 @@ function displayStockSummary() {
 
 async function displayStockCharts() {
     var container = document.getElementById('highStockChart');
-
-        // const data = await fetch(
-        //     'https://demo-live-data.highcharts.com/aapl-c.json'
-        // ).then(response => response.json());
-    
-        // Create the chart
-        //stockData.charts.results.map(obj => [obj.t, obj.c])
-        var data = stockData.charts.results.map(obj => [obj.t, obj.c, obj.v]);
-        const stockPriceArea = [],
-        volume = [],
-        dataLength = stockData.charts.results.length
-        date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
-        var minimumYaxis = Math.min(...data.map(obj => obj[1]));
+    var data = stockData.charts.results.map(obj => [obj.t, obj.c, obj.v]);
+    const stockPriceArea = [],
+    volume = [],
+    dataLength = stockData.charts.results.length
+    date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
+    var maximumVol = Math.max(...data.map(obj => obj[2]));
     for (let i = 0; i < dataLength; i += 1) {
         stockPriceArea.push([
             data[i][0],
@@ -297,12 +298,27 @@ async function displayStockCharts() {
         },
 
         subtitle: {
-            text: '<a href="https://polygon.io/">Source: Polygon.io</a>',
+            text: '<a href="https://polygon.io/" target="__ ">Source: Polygon.io</a>',
             useHTML: true
+        },
+
+        navigator: {
+            series: {
+                accessibility: {
+                    exposeAsGroupOnly: true
+                }
+            }
         },
 
         xAxis: {
             type: 'datetime'
+        },
+
+        plotOptions: {
+            series: {
+                pointWidth: 4,
+                pointPlacement: 'on'
+            }
         },
 
         yAxis: [{
@@ -312,22 +328,14 @@ async function displayStockCharts() {
             title: {
                 text: 'Stock Price'
             },
-            min: minimumYaxis - 20,
-            height: '100%',
             opposite: false,
         }, {
-            labels: {
-                formatter: function () {
-                    return (this.value / 1000000) + 'M';
-                }
-            },
             title: {
                 text: 'Volume',
             },
             opposite: true,
-            top: '40%',
-            height: '60%',
-            offset: 40
+            min: 0,
+            max: 2*maximumVol
         }],
 
         series: [{
@@ -335,6 +343,19 @@ async function displayStockCharts() {
             type: 'area',
             data: stockPriceArea,
             yAxis: 0,
+            threshold: null,
+            fillColor: {
+                linearGradient: {
+                    x1: 0,
+                    y1: 0,
+                    x2: 0,
+                    y2: 1
+                },
+                stops: [
+                    [0, Highcharts.getOptions().colors[0]],
+                    [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                ]
+            },
             tooltip: {
                 valueDecimals: 2
             }
@@ -350,7 +371,17 @@ async function displayStockCharts() {
 
 function displayLatestNews() {
     var stockLatestNews = document.getElementById('stockLatestNews');
-    var news = stockData.latestNews.slice(0,5);
+    //var news = stockData.latestNews.slice(0,5);
+    var news = [];
+    var item = stockData.latestNews.length > 5 ? 5 : stockData.latestNews.length;
+    var counter = 0;
+    while (item > 0) {
+        if (stockData.latestNews[counter].headline !== "" && stockData.latestNews[counter].image !== "" && stockData.latestNews[counter].url !== "" && stockData.latestNews[counter].datetime !== "") {
+            news.push(stockData.latestNews[counter]);
+            item--;
+        }
+        counter++;
+    }
     var html = '';
     html = `
     <div class=\"newsInfo\"> 
@@ -370,7 +401,7 @@ function displayLatestNews() {
                 <td class="newsContent">
                     <p class="newsTitle">${newsItem.headline}</p>
                     <p class="newsDate">${formattedDate}</p>
-                    <p class="linkPost"><a href="${newsItem.url}">See Original Post</a></p>
+                    <p class="linkPost"><a href="${newsItem.url}" target="__ ">See Original Post</a></p>
                 </td>
             </tr>`;
         }
@@ -405,3 +436,20 @@ function openTab(evt, tabName) {
     }
 }
 
+function remove(event) {
+    event.preventDefault();
+    var errorContainer = document.getElementById('errorContainer');
+    errorContainer.style.display = 'none';
+    var profileContainer = document.getElementById('profileContainer');
+    profileContainer.style.display = 'none';
+    var stockProfile = document.getElementById('stockProfile');
+    stockProfile.innerHTML = '';
+    var stockSummary = document.getElementById('stockSummaryInfo');
+    stockSummary.innerHTML = '';
+    var highStockChart = document.getElementById('highStockChart');
+    highStockChart.innerHTML = '';
+    var stockLatestNews = document.getElementById('stockLatestNews');
+    stockLatestNews.innerHTML = '';
+    var stockSearch = document.getElementById('stockSearch');
+    stockSearch.value = '';
+}

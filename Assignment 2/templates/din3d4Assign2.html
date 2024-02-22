@@ -32,7 +32,7 @@
             <div class="tab">
                 <button id="stock" class="profileInfo" onclick="openTab(event, 'stockProfile')">Company</button>
                 <button id="stockSummary" class="profileInfo" onclick="openTab(event, 'stockSummaryInfo')">Stock Summary</button>
-                <button id="charts" class="profileInfo" onclick="openTab(event, 'highCharts')">Charts</button>
+                <button id="charts" class="profileInfo" onclick="openTab(event, 'highStockChart')">Charts</button>
                 <button id="news" class="profileInfo" onclick="openTab(event, 'stockLatestNews')">Latest News</button>
             </div>
             <div id="stockProfile" class="tabcontent" style="display: block">
@@ -41,10 +41,7 @@
             <div id="stockSummaryInfo" class="tabcontent" style="display: none">
             </div>
 
-            <div id="highCharts" class="tabcontent" style="display: none">
-                <div class="chartInfo">
-                    <img class="chartImage" src="static/img/AAPL.svg">
-                </div>
+            <div id="highStockChart" class="tabcontent" style="display: none">
             </div>
 
             <div id="stockLatestNews" class="tabcontent" style="display: none">
@@ -56,6 +53,11 @@
         </div>
     </div>
     
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/drag-panes.js"></script>
     <script src="{{ url_for('static', filename='assignment_2.js') }}"></script>
 </body>
 </html>

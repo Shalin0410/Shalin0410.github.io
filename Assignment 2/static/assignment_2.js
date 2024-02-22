@@ -1,7 +1,7 @@
 window.tabContents = {
     'stockProfile': "",
     'stockSummaryInfo': "",
-    'highCharts': "",
+    'highStockChart': "",
     'stockLatestNews': ""
 };
 function getStockData(event) {
@@ -14,19 +14,22 @@ function getStockData(event) {
             console.log('Company Profile: ' + JSON.stringify(companyProfile));
             displayStockData(companyProfile);
             var stockSummaryPromise = fetchStockSummary(stock);
+            var stockRecommendationPromise = fetchStockRecommendation(stock);
             var chartsPromise = fetchStockCharts(stock);
             var latestNewsPromise = fetchLatestNews(stock);
 
-            Promise.all([stockSummaryPromise, chartsPromise, latestNewsPromise]).then(function(results) {
+            Promise.all([stockSummaryPromise, stockRecommendationPromise, chartsPromise, latestNewsPromise]).then(function(results) {
                 console.log('Stock Summary: ' + JSON.stringify(results[0]));
-                console.log('Stock Charts: ' + JSON.stringify(results[1]));
-                console.log('Latest News: ' + JSON.stringify(results[2]));
+                console.log('Stock Recommendation: ' + JSON.stringify(results[1]));
+                console.log('Stock Charts: ' + JSON.stringify(results[2]));
+                console.log('Latest News: ' + JSON.stringify(results[3]));
 
                 window.stockData = {
                     companyProfile: companyProfile,
                     stockSummary: results[0],
-                    charts: results[1],
-                    latestNews: results[2]
+                    stockRecommendation: results[1],
+                    charts: results[2],
+                    latestNews: results[3]
                 };
                 displayStockSummary();
                 displayStockCharts();
@@ -80,6 +83,20 @@ function fetchStockSummary(stock) {
         });
 }
 
+function fetchStockRecommendation(stock) {
+    return fetch('/api/stock/recommendation?symbol=' + stock)
+        .then(response => {
+            if (response.status === 500 ) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => { 
+            return data;
+        });
+}
+
+
 function fetchStockCharts(stock) {
     return fetch('/api/stock/charts?symbol=' + stock)
         .then(response => {
@@ -114,6 +131,12 @@ function displayStockData(stockData) {
         tablinks[i].className = tablinks[i].className.replace(" active", "");
     }
     tablinks[0].className += " active";
+
+    var tabcontent = document.getElementsByClassName("tabcontent");
+    for (var i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
+
     var stockProfile = document.getElementById('stockProfile');
     stockProfile.innerHTML = `
     <div class="stockInfo">
@@ -144,6 +167,8 @@ function displayStockData(stockData) {
         </table>
     </div>`;
     tabContents['stockProfile'] = stockProfile.innerHTML;
+    var companyProfile = document.getElementById('stockProfile');
+    companyProfile.style.display = "block";
 }
 
 function displayStockSummary() {
@@ -200,11 +225,11 @@ function displayStockSummary() {
         <table class="sellBuy">
             <tr>
                 <td style="color: #ff0000" >Strong<br>Sell</td>
-                <td style="background-color: #ff0000">4</td>
-                <td style="background-color: #a54848">4</td>
-                <td style="background-color: #6a8037;">20</td>
-                <td style="background-color: #36c054;">15</td>
-                <td style="background-color: #00ff26;">7</td>
+                <td style="background-color: #ff0000">${stockData.stockRecommendation[0].strongSell}</td>
+                <td style="background-color: #a54848">${stockData.stockRecommendation[0].sell}</td>
+                <td style="background-color: #6a8037;">${stockData.stockRecommendation[0].hold}</td>
+                <td style="background-color: #36c054;">${stockData.stockRecommendation[0].buy}</td>
+                <td style="background-color: #00ff26;">${stockData.stockRecommendation[0].strongBuy}</td>
                 <td style="color: #00ff26;">Strong<br>Buy</td>
             </tr>
         </table>
@@ -213,9 +238,121 @@ function displayStockSummary() {
     tabContents['stockSummaryInfo'] = stockSummary.innerHTML;
 }
 
-function displayStockCharts() {
+async function displayStockCharts() {
+    var container = document.getElementById('highStockChart');
+
+        // const data = await fetch(
+        //     'https://demo-live-data.highcharts.com/aapl-c.json'
+        // ).then(response => response.json());
     
-}
+        // Create the chart
+        //stockData.charts.results.map(obj => [obj.t, obj.c])
+        var data = stockData.charts.results.map(obj => [obj.t, obj.c, obj.v]);
+        console.log(data);
+        const stockPriceArea = [],
+        volume = [],
+        dataLength = stockData.charts.results.length
+        date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
+
+    for (let i = 0; i < dataLength; i += 1) {
+        stockPriceArea.push([
+            data[i][0],
+            data[i][1]
+        ]);
+
+        volume.push([
+            data[i][0], // the date
+            data[i][2] // the volume
+        ]);
+    }
+
+    // create the chart
+    Highcharts.stockChart(container, {
+
+        rangeSelector: {
+            inputEnabled: false,
+            buttons: [{
+                type: 'day',
+                count: 7,
+                text: '7d',
+                enabled: true
+            }, {
+                type: 'day',
+                count: 15,
+                text: '15d',
+                enabled: true
+            }, {
+                type: 'month',
+                count: 1,
+                text: '1m',
+                enabled: true
+            }, {
+                type: 'month',
+                count: 3,
+                text: '3m',
+                enabled: true
+            }, {
+                type: 'month',
+                count: 6,
+                text: '6m',
+                enabled: true
+            }]
+        },
+
+        title: {
+            text: 'Stock Price ' + stockData.companyProfile.ticker + ' ' + date,
+        },
+
+        subtitle: {
+            text: '<a href="https://polygon.io/">Source: Polygon.io</a>',
+            useHTML: true
+        },
+
+        xAxis: {
+            type: 'datetime'
+        },
+
+        yAxis: [{
+            labels: {
+                format: '{value}'
+            },
+            title: {
+                text: 'Stock Price'
+            },
+            opposite: false,
+            //height: '60%'
+        }, {
+            labels: {
+                formatter: function () {
+                    return (this.value / 1000000) + 'M';
+                }
+            },
+            title: {
+                text: 'Volume',
+            },
+            opposite: true,
+            top: '40%',
+            height: '60%',
+            offset: 40
+        }],
+
+        series: [{
+            name: 'Stock Price',
+            type: 'area',
+            data: stockPriceArea,
+            yAxis: 0,
+            tooltip: {
+                valueDecimals: 2
+            }
+        }, {
+            name: 'Volume',
+            data: volume,
+            type: 'column',
+            yAxis: 1,
+            color: 'black',
+        }]
+    });
+} 
 
 function displayLatestNews() {
     var stockLatestNews = document.getElementById('stockLatestNews');
@@ -269,4 +406,8 @@ function openTab(evt, tabName) {
     currentTab.innerHTML = tabContents[tabName];
     currentTab.style.display = "block";
     evt.currentTarget.className += " active";
+    if (tabName === 'highStockChart') {
+        displayStockCharts();
+    }
 }
+

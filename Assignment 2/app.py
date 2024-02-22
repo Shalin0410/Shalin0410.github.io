@@ -40,21 +40,34 @@ def get_stock_summary():
         
         return jsonify(data)
     
-@app.route('/api/stock/charts', methods=['GET'])
-def get_stock_charts():
+@app.route('/api/stock/recommendation', methods=['GET'])
+def get_stock_recommendation():
     stock = request.args.get('symbol', '').upper()
-    current_date = datetime.now().strftime('%Y-%m-%d')
-    print(current_date)
-    past_date = (datetime.now() - relativedelta(months=5, days=1)).strftime('%Y-%m-%d')
-    print(past_date)
-    response = requests.get(f'https://api.polygon.io/v2/aggs/ticker/{stock}/range/1/day/{past_date}/{current_date}?adjusted=true&sort=asc&apiKey=i5ppHPBsTV1OWhtbCpigMuLzc7MYn3F7')
-    print("HELLO Stock Charts")
-    print(response)
+    response = requests.get(f'https://finnhub.io/api/v1/stock/recommendation?symbol={stock}&token={API_KEY}')
     if response.status_code != 200:
         return jsonify(error=f'Error: {response.status_code}'), 500
     else:
         data = response.json()
-        print(data)
+        if not data:
+            return jsonify(error=f'Error: No record has been found, please enter a valid symbol'), 404
+        
+        return jsonify(data)
+
+@app.route('/api/stock/charts', methods=['GET'])
+def get_stock_charts():
+    stock = request.args.get('symbol', '').upper()
+    current_date = datetime.now().strftime('%Y-%m-%d')
+    # print(current_date)
+    past_date = (datetime.now() - relativedelta(months=6, days=1)).strftime('%Y-%m-%d')
+    # print(past_date)
+    response = requests.get(f'https://api.polygon.io/v2/aggs/ticker/{stock}/range/1/day/{past_date}/{current_date}?adjusted=true&sort=asc&apiKey=i5ppHPBsTV1OWhtbCpigMuLzc7MYn3F7')
+    # print("HELLO Stock Charts")
+    # print(response)
+    if response.status_code != 200:
+        return jsonify(error=f'Error: {response.status_code}'), 500
+    else:
+        data = response.json()
+        # print(data)
         if not data:
             return jsonify(error=f'Error: No record has been found, please enter a valid symbol'), 404
         

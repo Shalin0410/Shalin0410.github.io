@@ -236,7 +236,7 @@ function displayStockSummary() {
             </tr>
         </table>
     </div>
-    <div style="text-align: center">Recommendation Trends</div>`;
+    <div style="text-align: center" class="recommendation>Recommendation Trends</div>`;
     tabContents['stockSummaryInfo'] = stockSummary.innerHTML;
 }
 
@@ -246,7 +246,10 @@ async function displayStockCharts() {
     const stockPriceArea = [],
     volume = [],
     dataLength = stockData.charts.results.length
-    date = new Date().getFullYear() + '-' + (new Date().getMonth() + 1) + '-' + new Date().getDate();
+    var date = new Date();
+    var date = date.getFullYear() + '-' + 
+                    String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                    String(date.getDate()).padStart(2, '0');
     var maximumVol = Math.max(...data.map(obj => obj[2]));
     for (let i = 0; i < dataLength; i += 1) {
         stockPriceArea.push([
@@ -391,7 +394,7 @@ function displayLatestNews() {
             var timestamp = newsItem.datetime;
             var date = new Date(timestamp * 1000);
             // Format the date
-            var day = date.getDate();
+            var day = String(date.getDate()).padStart(2, '0');
             var month = date.toLocaleString('default', { month: 'long' }); // get the month name
             var year = date.getFullYear();
             var formattedDate = day + ' ' + month + ', ' + year;

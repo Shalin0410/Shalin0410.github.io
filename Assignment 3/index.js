@@ -1,11 +1,23 @@
 const express = require("express");
+const axios = require("axios");
+//const mongoose = require("mongoose");
 
 const app = express();
 
 app.listen(3000, () => console.log("Server listening at port 3000"));
 
-app.get("/", (req, res) => {
-    res.send("Hello World!");
+const compSymbol = "AAPL";
+const API_TOKEN = "cn961jhr01qoee99obggcn961jhr01qoee99obh0"
+
+app.get("/", async (req, res) => {
+    const tickerSymbol = compSymbol;
+    try {
+        const response = await axios.get(`https://finnhub.io/api/v1/search?q=${tickerSymbol}&token=${API_TOKEN}`);
+        res.send(response.data);
+    } catch (error) {
+        console.error(error);
+    }
+
 });
 
 app.get("/search/:tickerSymbol", (req, res) => {

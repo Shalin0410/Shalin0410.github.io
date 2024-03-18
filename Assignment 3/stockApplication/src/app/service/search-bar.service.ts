@@ -1,21 +1,17 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Component, inject, Injectable } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, of, OperatorFunction } from 'rxjs';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchBarService {
-  private baseUrl = 'http://localhost:3000';
+  private apiUrl = 'http://localhost:3000/search';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  searchTickerSymbol(query: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/search/home?q=${query}`);
-  }
-
-  getTickerSymbol(ticker: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/search/${ticker}`);
+  searchCompanies(companyName: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}?q=${companyName}`);
   }
 }

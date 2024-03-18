@@ -1,17 +1,26 @@
-<div class="container">
+<fieldset class="container">
     <div class="row">
         <div class="col-2 col-md-3">
         </div>
         <div class="col">
             <p class="text-center fs-2">Stock Search</p>
-            <form class="form-inline">
-                <div class="form-group">
-                    <input id="typeahead-basic" type="text" class="form-control" style="border-radius: 30px;"/>
-                </div>
-            </form>
+                <input 
+                class="form-control"
+                [class.is-invalid]="searchFailed"
+                [(ngModel)]="model"
+                name="stockSearch"
+                [ngbTypeahead]="search"
+                style="border-radius: 30px; border-color: blue; border-width: 3px;"
+                placeholder="Enter stock ticker symbol"
+                />
+                @if (searching) {
+                    <small class="form-text text-muted">searching...</small>
+                }
+                @if (searchFailed) {
+                    <div class="invalid-feedback">Sorry, suggestions could not be loaded.</div>
+                }
         </div>
         <div class="col-2 col-md-3">
         </div>
     </div>
-</div>
-<!-- <input id="typeahead-basic" type="text" class="form-control" [(ngModel)]="model" [ngbTypeahead]="search" /> -->
+</fieldset>

@@ -1,29 +1,47 @@
 import { Component } from '@angular/core';
-import { NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
-import { Observable, OperatorFunction } from 'rxjs';
-import { debounceTime, distinctUntilChanged, map } from 'rxjs/operators';
-import { FormsModule } from '@angular/forms';
-import { JsonPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms'
+import { NgbTypeaheadConfig, NgbTypeaheadModule } from '@ng-bootstrap/ng-bootstrap';
 import { SearchBarService } from '../../service/search-bar.service';
-
+import { Observable, OperatorFunction, of } from 'rxjs';
+import { catchError, debounceTime, distinctUntilChanged, map, switchMap, tap } from 'rxjs/operators';
+import { JsonPipe } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-search-bar',
   standalone: true,
-  imports: [NgbTypeaheadModule, FormsModule, JsonPipe],
+  providers: [SearchBarService, NgbTypeaheadConfig],
+  imports: [NgbTypeaheadModule, FormsModule, JsonPipe, HttpClientModule],
   templateUrl: './search-bar.component.html',
   styleUrl: './search-bar.component.css'
 })
 export class SearchBarComponent {
-  // model: any;
+	model: any;
+	searching = false;
+	searchFailed = false;
 
-	// search: OperatorFunction<string, readonly string[]> = (text$: Observable<string>) =>
-	// 	text$.pipe(
-	// 		debounceTime(200),
-	// 		distinctUntilChanged(),
-	// 		map((term) =>
-	// 			term.length < 1 ? [] : tickerSymbol.filter((v) => v.toLowerCase().indexOf(term.toLowerCase()) > -1).slice(0, 10),
-	// 		),
-	// 	);
+	constructor(private searchService: SearchBarService, private config: NgbTypeaheadConfig) {
+		this.config.showHint = true;
+	}
 
+	search: OperatorFunction<string, readonly string[]> = (text$: Observable<string>) =>
+	text$.pipe(
+		debounceTime(300),
+		distinctUntilChanged(),
+		tap(() => (this.searching = true)),
+		switchMap((term) =>
+			this.searchService.searchCompanies(term).pipe(
+				tap(results => {
+					console.log('Results from searchService:', results);
+				}),
+				tap(() => (this.searchFailed = false)),
+				catchError(() => {
+					console.log('Error from searchService');
+					this.searchFailed = true;
+					return of([]);
+				})
+			)
+		),
+		tap(() => (this.searching = false))
+	);
 }

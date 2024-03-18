@@ -1,24 +1,28 @@
 const express = require('express');
 const axios = require('axios');
-
+const cors = require('cors');
 const app = express();
+app.use(cors({ origin: 'http://localhost:4200' }));
 const port = 3000;
 const API_KEY = 'cn961jhr01qoee99obggcn961jhr01qoee99obh0';
 
 // Home Route
-app.get('/', (req, res) => {
-  res.redirect('/search/home');
-});
+// app.get('/', (req, res) => {
+//   res.redirect('/search/home');
+// });
+app.use(express.json());
 
-app.get('/search/home', async (req, res) => {
-    const { ticker } = req.params;
+app.get('/search', async (req, res) => {
+    const companyName = req.query.q;
+    console.log(companyName);
+    const url = `https://finnhub.io/api/v1/search?q=${companyName}&token=${API_KEY}`;
     try {
-        const response = await axios.get(`https://finnhub.io/api/v1/search?q=${ticker}&token=${API_KEY}`);
-        const listofCompanies = response.data;
-        res.json(listofCompanies);
+        const response = await axios.get(url);
+        console.log(response.data.result);
+        res.json(response.data.result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Failed to fetch list of companies' });
+        console.log('Failed to fetch list of companies')
+        res.status(500).json({ error: error.message });
     }
 });
 

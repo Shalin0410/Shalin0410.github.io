@@ -1,0 +1,20 @@
+.bg-dark {
+    --bs-bg-opacity: 1;
+    background-color: blue !important;
+}
+
+.navbar-toggler:focus {
+    text-decoration: none;
+    outline: 0;
+    box-shadow: none;
+}
+
+.navbar-toggler {
+    border: 2px solid;
+}
+
+.nav-link.active {
+    border: 2px solid white;
+    border-radius: 10px;
+    background-color: transparent;
+}

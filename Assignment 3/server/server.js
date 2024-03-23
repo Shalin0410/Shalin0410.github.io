@@ -14,10 +14,11 @@ app.use(express.json());
 
 app.get('/search', async (req, res) => {
     const companyName = req.query.q;
-    console.log(companyName);
+    console.log('Auto Complete Search: ', companyName);
     const url = `https://finnhub.io/api/v1/search?q=${companyName}&token=${API_KEY}`;
     try {
         const response = await axios.get(url);
+        
         console.log(response.data.result);
         res.json(response.data.result);
     } catch (error) {
@@ -27,11 +28,12 @@ app.get('/search', async (req, res) => {
 });
 
 // Search Details Route
-app.get('/search/:ticker', async (req, res) => {
-  const { ticker } = req.params;
+app.get('/search/:symbol', async (req, res) => {
+  const { symbol } = req.params;
+  console.log('Company Ticker: ', symbol);
   try {
     // Make API call to get company profile using ticker
-    const response = await axios.get(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=${API_KEY}`);
+    const response = await axios.get(`https://finnhub.io/api/v1/stock/profile2?symbol=${symbol}&token=${API_KEY}`);
     const companyProfile = response.data;
     res.json(companyProfile);
   } catch (error) {

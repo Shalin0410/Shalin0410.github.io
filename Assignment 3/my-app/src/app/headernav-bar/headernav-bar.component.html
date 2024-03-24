@@ -7,14 +7,13 @@
             </button> 
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav"> 
                 <ul class="navbar-nav mb-2 mb-lg-0"> 
-                    <li class="nav-item border border-2 border-white rounded-4 m-2 my-md-0"> 
-                        <a class="nav-link mx-2" routerLink="/">Search</a> 
-                        <!-- (click)="searchWithSymbol()" -->
+                    <li class="nav-item m-2 my-md-0" [class.active]="isActive()"> 
+                        <a class="nav-link mx-2" (click)="searchWithSymbol()">Search</a> 
                     </li> 
-                    <li class="nav-item border border-2 border-white rounded-4 m-2 my-md-0"> 
+                    <li class="nav-item m-2 my-md-0" routerLinkActive="active"> 
                         <a class="nav-link mx-2" routerLink="/watchlist">Watchlist</a> 
                     </li> 
-                    <li class="nav-item border border-2 border-white rounded-4 m-2 my-md-0"> 
+                    <li class="nav-item m-2 my-md-0" routerLinkActive="active"> 
                         <a class="nav-link mx-2" routerLink="/portfolio">Portfolio</a> 
                     </li> 
                 </ul> 

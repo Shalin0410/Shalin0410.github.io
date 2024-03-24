@@ -1,0 +1,20 @@
+.search-bar {
+    margin: 20px 0;
+}
+
+.search-input {
+    border: 3px solid #0511f2;
+    border-radius: 10px;
+    width: 100%;
+}
+
+mat-icon {
+    padding: 0 5px !important;
+}
+
+.search-input .mat-form-field-underline {
+    display: none !important; /* Remove the bottom line */
+}
+.search-input .mat-form-field-infix {
+    padding-bottom: 0 !important; /* Remove the bottom spacing */
+}

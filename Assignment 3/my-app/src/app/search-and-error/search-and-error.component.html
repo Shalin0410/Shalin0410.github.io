@@ -1,2 +1,39 @@
-<app-search-bar (searchEvent)="onSearch($event)"></app-search-bar>
-<app-error-message [message]="errorMessage"></app-error-message>
+<div class="container-fluid mt-3">
+    <div class="row">
+        <div class="col col-md-3"></div>
+        <div class="col-10 col-md-6">
+            <p class="text-center fs-2">STOCK SEARCH</p>
+            <div class="search-bar">
+                    <mat-form-field class="search-input">
+                        <input 
+                        matInput
+                        type="text"
+                        placeholder="Enter stock ticker symbol" 
+                        [(ngModel)]="searchQuery"
+                        name="searchQuery" 
+                        (input)="onSearchInput()"
+                        (keyup.enter)="executeSearch()">
+                        <mat-icon matSuffix (click)="executeSearch()">search</mat-icon>
+                        <mat-icon matSuffix (click)="clearResults()">close</mat-icon>
+                    </mat-form-field>
+                    <div *ngIf="showAutocomplete">
+                            <mat-option *ngFor="let suggestion of autocompleteSuggestions" (click)="selectSuggestion(suggestion)">
+                                {{ suggestion.symbol }} | {{ suggestion.description }}
+                            </mat-option>
+                    </div>
+            </div>
+        </div>
+        <div class="col col-md-3"></div>
+    </div>
+</div>
+<!-- <app-search-bar (searchEvent)="onSearch($event)"></app-search-bar> -->
+<div *ngIf="errorMessage">
+    <ngb-alert class="d-flex justify-content-center mx-5" type="danger" (closed)="close()">
+        <div>
+            {{ errorMessage }}
+        </div>
+    </ngb-alert>
+</div>
+<!-- <app-error-message *ngIf="errorMessage" [message]="errorMessage"></app-error-message> -->
+<app-company-details *ngIf="companyDetails" [companyDetails]="companyDetails"></app-company-details>
+

@@ -1,0 +1,58 @@
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private apiUrl = 'http://localhost:3000';
+
+  constructor(private http: HttpClient) { }
+
+  getUser(userId: string) {
+    return this.http.get(`${this.apiUrl}/users/${userId}`);
+  }
+
+  updateUser(userId: string, data: any) {
+    return this.http.put(`${this.apiUrl}/users/${userId}`, data);
+  }
+}
+
+-------------------------------------------------------------------------------------------
+
+import { UserService } from '../user.service';
+
+// ...
+
+constructor(private userService: UserService) { }
+
+// ...
+
+async buyStock(userId: string, ticker: string, quantity: number) {
+  const user = await this.userService.getUser(userId).toPromise();
+  const cost = this.companyDetails.price * quantity;
+
+  if (user.money >= cost) {
+    user.money -= cost;
+    user.stocks[ticker] = (user.stocks[ticker] || 0) + quantity;
+
+    await this.userService.updateUser(userId, user).toPromise();
+  } else {
+    console.error('Not enough money to buy the stock');
+  }
+}
+
+async sellStock(userId: string, ticker: string, quantity: number) {
+  const user = await this.userService.getUser(userId).toPromise();
+
+  if (user.stocks[ticker] >= quantity) {
+    user.money += this.companyDetails.price * quantity;
+    user.stocks[ticker] -= quantity;
+
+    await this.userService.updateUser(userId, user).toPromise();
+  } else {
+    console.error('Not enough stock to sell');
+  }
+}
+
+-----------------------------------------------------------------------------------------------

@@ -7,8 +7,13 @@ import { HttpClient } from '@angular/common/http'; // Import the HttpClient modu
 })
 export class SearchBarService {
   private apiUrl = 'http://localhost:3000';
+  public currentSearchQuery: string = '';
 
-  constructor(private http: HttpClient) { } // Inject the HttpClient module
+  constructor(private http: HttpClient) { }
+
+  setCurentSearchQuery(searchQuery: string) {
+    this.currentSearchQuery = searchQuery;
+  }
 
   searchCompanies(companyName: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/search/?q=${companyName}`);

@@ -1,29 +1,27 @@
-import {Component, Output, EventEmitter, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { SearchBarService } from '../service/search-bar.service';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { CompanyDetailsComponent } from '../company-details/company-details.component';
-import {Observable} from 'rxjs';
-import {startWith, map} from 'rxjs/operators';
-import {AsyncPipe} from '@angular/common';
 import {MatAutocompleteModule} from '@angular/material/autocomplete';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatFormFieldModule} from '@angular/material/form-field';
-import {Router} from '@angular/router';
+import {Router, NavigationEnd} from '@angular/router';
 import {NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
+import { SearchBarService } from '../service/search-bar.service';
+import {SearchResultsService} from '../service/search-result.service';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-search-and-error',
   standalone: true,
-  providers: [SearchBarService],
+  providers: [SearchBarService, SearchResultsService],
   imports: [
     FormsModule, 
     CommonModule, 
     MatAutocompleteModule, 
-    ReactiveFormsModule, 
-    AsyncPipe, 
+    ReactiveFormsModule,  
     MatIconModule, 
     MatInputModule, 
     MatFormFieldModule, 
@@ -35,47 +33,82 @@ import {NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
 export class SearchAndErrorComponent {
   searchQuery: string = '';
   autocompleteSuggestions: any[] = [];
-  companyDetails: any;
+  searchResults: any = {
+    companyDetails: {},
+    companyQuote: {},
+    companyNews: {},
+    companyRecommendations: {},
+    companySentiments: {},
+    companyPeers: {},
+    companyEarnings: {},
+    companyChart: {}
+  };
   showAutocomplete: boolean = false;
   errorMessage: string = '';
 
-  constructor(private searchBarService: SearchBarService, private router: Router, private route: ActivatedRoute) { }
+  constructor(private searchBarService: SearchBarService, private router: Router, private route: ActivatedRoute, private searchResultsService: SearchResultsService) { 
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd)
+    ).subscribe((event) => {
+      console.log('NavigationEnd:', event);
+      const path = this.route.snapshot.routeConfig?.path;
+      console.log('path:', path);
+      if (path === 'search/:symbol') {
+        const symbol = this.route.snapshot.params['symbol'];
+        console.log('symbol:', symbol);
+        let prevQuery = this.searchQuery;
+        this.searchQuery = symbol;
+        const results = this.searchResultsService.getResults();
+        if (prevQuery == this.searchQuery && results) {
+          this.searchResults = results;
+        } else {
+          this.executeSearch();
+        }
+      }
+    }
+    )
+  }
 
-  // ngOnInit() {
-  //   const path = this.route.snapshot.routeConfig?.path;
-  //   console.log('path:', path);
+  ngOnInit() {
+    console.log('Search and Error Component Initialized');
+    console.log('searchResults:', this.searchResults);
+    this.searchResults.companyDetails = {};
+    const path = this.route.snapshot.routeConfig?.path;
+    console.log('path:', path);
     
-  //   if (path === 'search/home') {
-  //     console.log('errorMessage:', this.errorMessage);
-  //     this.companyDetails = null;
-  //   } else if (path === 'search/:symbol') {
-  //     const symbol = this.route.snapshot.params['symbol'];
-  //     console.log('symbol:', symbol);
-  //     this.searchQuery = symbol;
-  //     this.executeSearch();
-  //   }
-  // }
+    if (path === 'search/:symbol') {
+      const symbol = this.route.snapshot.params['symbol'];
+      console.log('symbol:', symbol);
+      this.searchQuery = symbol;
+      const results = this.searchResultsService.getResults();
+      if (results) {
+        this.searchResults = results;
+      } else {
+        this.executeSearch();
+      }
+    }
+  }
 
-async onSearch() {
+  onSearch() {
     console.log('searchQuery:', this.searchQuery);
     console.log('onSearch');
-    if (this.errorMessage === 'Please enter a valid ticker') {
-      console.log('I was here');
-      console.log(this.errorMessage);
-      this.router.navigate(['/search/home']);
-      //this.errorMessage = 'Please enter a valid ticker';
-    } else {
-      this.searchBarService.getCompanyDetails(this.searchQuery).subscribe(
-        (data: any) => {
-          console.log('YOLO:', data);
-          if (!data || Object.keys(data).length === 0) {
-            this.errorMessage = 'No data found. Please enter a valid ticker';
-            console.log('Error Message: ', this.errorMessage);
-          } else {
-            this.companyDetails = data;
-          }
+    if (this.errorMessage !== 'Please enter a valid ticker') {
+      this.searchBarService.getAllDetails(this.searchQuery).subscribe(data => {
+        this.searchResults.companyDetails = data[0];
+        this.searchResults.companyQuote = data[1];
+        this.searchResults.companyNews = data[2];
+        this.searchResults.companyRecommendations = data[3];
+        this.searchResults.companySentiments = data[4];
+        this.searchResults.companyPeers = data[5];
+        this.searchResults.companyEarnings = data[6];
+        this.searchResults.companyCharts = data[7];
+        if (Object.keys(this.searchResults.companyDetails).length === 0) {
+          this.errorMessage = 'No data found. Please enter a valid ticker';
+          console.log('Error Message: ', this.errorMessage);
+        } else {
+          this.searchResultsService.setResults(this.searchResults, this.searchQuery);
         }
-      );
+      });
     }
   }
 
@@ -90,8 +123,8 @@ async onSearch() {
       console.log(this.searchQuery);
       console.log('Routing to search page')
       this.router.navigate(['/search', this.searchQuery]);
+      this.onSearch();
     }
-    this.onSearch();
   }
 
   onSearchInput() {
@@ -103,6 +136,10 @@ async onSearch() {
     //   console.log(this.autocompleteSuggestions);
     // });
     // console.log(this.searchQuery);
+  }
+
+  isEmpty(obj: any) {
+    return Object.keys(this.searchResults.companyDetails).length === 0;
   }
 
   clearResults() {
@@ -119,9 +156,7 @@ async onSearch() {
     this.executeSearch();
   }
 
-  message: string = '';
-
   close() {
-    this.message = '';
+    this.errorMessage = '';
   }
 }

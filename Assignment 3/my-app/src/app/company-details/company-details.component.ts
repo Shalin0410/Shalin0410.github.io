@@ -14,8 +14,7 @@ import { InsightsComponent } from '../insights/insights.component';
   standalone: true,
   imports: [
     NgbAlertModule, 
-    CommonModule, 
-    SearchAndErrorComponent, 
+    CommonModule,  
     MatTabsModule, 
     SummaryComponent, 
     TopNewsComponent, 
@@ -25,7 +24,7 @@ import { InsightsComponent } from '../insights/insights.component';
   styleUrl: './company-details.component.css'
 })
 export class CompanyDetailsComponent {
-  @Input() companyDetails: any;
+  @Input() searchResults: any;
   market: string = '';
   intervalId: any;
   marketColor: string = '';
@@ -35,21 +34,18 @@ export class CompanyDetailsComponent {
 
     console.log('currentTimestamp:', currentTimestamp);
 
-    if (this.companyDetails && this.companyDetails.t) {
-      const difference = currentTimestamp - this.companyDetails.t * 1000;
-      console.log('difference:', difference);
+    if (this.searchResults && this.searchResults.companyQuote.t) {
+      const difference = currentTimestamp - this.searchResults.companyQuote.t * 1000;
 
       if (difference > 300000) {
-        console.log('Market is closed');
-        this.market = 'Market is closed on ' + (this.companyDetails.t);
+        this.market = 'Market is closed';
       } else {
-        console.log('Market is open');
         this.market = 'Market is open';
       }
       this.getMarketColor();
     }
 
-    this.intervalId = setInterval(() => this.checkMarketStatus(), 15000);
+    //this.intervalId = setInterval(() => this.ngOnInit(), 15000);
   }
 
   ngOnDestroy() {
@@ -58,31 +54,37 @@ export class CompanyDetailsComponent {
     }
   }
 
-  checkMarketStatus() {
-    console.log('Checking market status');
-    const currentTimestamp = Date.now();
+  // checkMarketStatus() {
+  //   console.log('Checking market status');
+  //   const currentTimestamp = Date.now();
 
-    console.log('currentTimestamp:', currentTimestamp);
+  //   console.log('currentTimestamp:', currentTimestamp);
 
-    if (this.companyDetails && this.companyDetails.t) {
-      const difference = currentTimestamp - this.companyDetails.t * 1000;
+  //   if (this.searchResults && this.searchResults.companyQuote.t) {
+  //     const difference = currentTimestamp - this.searchResults.companyQuote.t * 1000;
 
-      if (difference > 300000) {
-        console.log('Market is closed');
-        this.market = 'Market is closed on ' + (this.companyDetails.t);
-      } else {
-        console.log('Market is open');
-        this.market = 'Market is open';
-      }
-      this.getMarketColor();
+  //     if (difference > 300000) {
+  //       this.market = 'Market is closed';
+  //     } else {
+  //       this.market = 'Market is open';
+  //     }
+  //     this.getMarketColor();
+  //   }
+  // }
+
+  getMarketColor() {
+    if (this.market.startsWith('Market is closed')) {
+      console.log('Market is closed');
+      this.marketColor = 'text-danger';
+    } else {
+      console.log('Market is open');
+      this.marketColor = 'text-success';
     }
   }
 
-  getMarketColor() {
-    if (this.market === 'Market is closed') {
-      this.marketColor = 'text-danger';
-    } else {
-      this.marketColor = 'text-success';
-    }
+  convertDate(timestamp: number) {
+    const date = new Date(timestamp * 1000);
+    const formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
+    return formattedDate;
   }
 }

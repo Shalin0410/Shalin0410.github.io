@@ -35,5 +35,5 @@
     </ngb-alert>
 </div>
 <!-- <app-error-message *ngIf="errorMessage" [message]="errorMessage"></app-error-message> -->
-<app-company-details *ngIf="companyDetails" [companyDetails]="companyDetails"></app-company-details>
+<app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults"></app-company-details>
 

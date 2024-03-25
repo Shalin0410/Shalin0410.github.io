@@ -8,7 +8,7 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav"> 
                 <ul class="navbar-nav mb-2 mb-lg-0"> 
                     <li class="nav-item m-2 my-md-0" [class.active]="isActive()"> 
-                        <a class="nav-link mx-2" (click)="searchWithSymbol()">Search</a> 
+                        <a class="nav-link mx-2" [routerLink]="['/search/', searchResultsService.getLastSearchedToken()]">Search</a> 
                     </li> 
                     <li class="nav-item m-2 my-md-0" routerLinkActive="active"> 
                         <a class="nav-link mx-2" routerLink="/watchlist">Watchlist</a> 

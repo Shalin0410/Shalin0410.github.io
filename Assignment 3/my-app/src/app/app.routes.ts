@@ -6,6 +6,7 @@ import { SearchAndErrorComponent } from './search-and-error/search-and-error.com
 
 export const routes: Routes = [
     { path: '', redirectTo: '/search/home', pathMatch: 'full'},
+    { path: 'search', redirectTo: '/search/home', pathMatch: 'full'},
     { path: 'search/home', component: SearchAndErrorComponent},
     { path: 'search/:symbol', component: SearchAndErrorComponent},
     { path: 'watchlist', component: WatchlistComponent },

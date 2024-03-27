@@ -7,13 +7,12 @@ export class SearchResultsService {
   private results: any;
   private lastSearchedToken: string = '';
 
-  constructor() {
-    this.lastSearchedToken = '';
-  }
-
   setResults(results: any, token: string) {
+    //console.log('setResults:', results);
+    console.log('setResults token:', token);
     this.results = results;
     this.lastSearchedToken = token;
+    console.log('setResults lastSearchedToken:', this.lastSearchedToken);
   }
 
   getResults() {
@@ -21,6 +20,7 @@ export class SearchResultsService {
   }
 
   getLastSearchedToken() {
+    //console.log('getLastSearchedToken:', this.lastSearchedToken);
     return this.lastSearchedToken;
   }
 }

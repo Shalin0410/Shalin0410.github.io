@@ -49,6 +49,6 @@ export class HeadernavBarComponent {
 
   isActive(): boolean {
     const url = this.router.url;
-    return this.router.url.startsWith('/search/home');
+    return this.router.url.startsWith('/search');
   }
 }

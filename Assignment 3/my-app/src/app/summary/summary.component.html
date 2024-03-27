@@ -1,25 +1,37 @@
+<div class="container-fluid mt-3">
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 d-flex flex-column align-items-center text-center">
+          <small><b>High Price:</b> {{ searchResults.companyQuote.h }}</small>
+          <small><b>Low Price:</b> {{ searchResults.companyQuote.l }}</small>
+          <small><b>Open Price:</b> {{ searchResults.companyQuote.o }}</small>
+          <small><b>Prev. Close:</b> {{ searchResults.companyQuote.pc }}</small>
+        </div>
+        <div class="col-12 col-md-12 d-flex flex-column justify-content-center align-items-center text-center mt-5">
+          <p class="fs-5 text-center text-decoration-underline mb-3" style="font-weight: 500;">About the company</p>
+          <small class="mb-2"><b>IPO Start Date:</b> {{ searchResults.companyDetails.ipo }}</small>
+          <small class="mb-2"><b>Industry:</b> {{ searchResults.companyDetails.finnhubIndustry }}</small>
+          <small class="mb-2"><b>Webpage:</b> <a href="{{ searchResults.companyDetails.weburl }}"> {{ searchResults.companyDetails.weburl }}</a></small>
+          <small class="mb-2"><b>Company Peers:</b> </small>
+          <small> 
+              <span *ngFor="let peer of searchResults.companyPeers">
+                <a [routerLink]="['/search', peer]">{{ peer }}, </a>
+              </span>
+          </small>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <!-- Add your chart here -->
+        <highcharts-chart 
+        [Highcharts]="Highcharts"
+        [options]="chartOptions"
+        style="width: 100%; height: 400px; display: block;">
+        </highcharts-chart>
+      </div>
+    </div>
+</div>  
+
 <div class="summary-tab">
-    <h2>Summary</h2>
   
-    <div class="details">
-      <p>High Price: {{ searchResults.companyQuote.h }}</p>
-      <p>Low Price: {{ searchResults.companyQuote.l }}</p>
-      <p>Open Price: {{ searchResults.companyQuote.o }}</p>
-      <p>Prev. Close: {{ searchResults.companyQuote.pc }}</p>
-      <p>Timestamp: {{ searchResults.companyQuote.t }}</p>
-    </div>
-  
-    <div class="about-company">
-      <h3>About the Company</h3>
-      <p>IPO Start Date: {{ searchResults.companyDetails.ipo }}</p>
-      <p>Industry: {{ searchResults.companyDetails.finnhubIndustry }}</p>
-      <p>Webpage: <a href="{{ searchResults.companyDetails.weburl }}">{{ searchResults.companyDetails.weburl }}</a></p>
-      <p>Company Peers: 
-        <span *ngFor="let peer of searchResults.companyPeers">
-          <a [routerLink]="['/search', peer]">{{ peer }}</a>
-        </span>
-      </p>
-    </div>
-  
-    <!-- Add your chart here -->
+    
 </div>

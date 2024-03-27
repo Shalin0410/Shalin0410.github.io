@@ -12,6 +12,7 @@ import {NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
 import { SearchBarService } from '../service/search-bar.service';
 import {SearchResultsService} from '../service/search-result.service';
 import { filter } from 'rxjs/operators';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-search-and-error',
@@ -26,7 +27,8 @@ import { filter } from 'rxjs/operators';
     MatInputModule, 
     MatFormFieldModule, 
     CompanyDetailsComponent,
-    NgbAlertModule],
+    NgbAlertModule,
+    MatProgressSpinnerModule],
   templateUrl: './search-and-error.component.html',
   styleUrl: './search-and-error.component.css'
 })
@@ -41,44 +43,24 @@ export class SearchAndErrorComponent {
     companySentiments: {},
     companyPeers: {},
     companyEarnings: {},
-    companyChart: {}
+    companyCharts: {},
+    companyHourlyCharts: {}
   };
   showAutocomplete: boolean = false;
   errorMessage: string = '';
+  isLoading: boolean = false;
 
   constructor(private searchBarService: SearchBarService, private router: Router, private route: ActivatedRoute, private searchResultsService: SearchResultsService) { 
-    this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd)
-    ).subscribe((event) => {
-      console.log('NavigationEnd:', event);
-      const path = this.route.snapshot.routeConfig?.path;
-      console.log('path:', path);
-      if (path === 'search/:symbol') {
-        const symbol = this.route.snapshot.params['symbol'];
-        console.log('symbol:', symbol);
-        let prevQuery = this.searchQuery;
-        this.searchQuery = symbol;
-        const results = this.searchResultsService.getResults();
-        if (prevQuery == this.searchQuery && results) {
-          this.searchResults = results;
-        } else {
-          this.executeSearch();
-        }
-      }
-    }
-    )
   }
 
   ngOnInit() {
+    this.errorMessage = '';
     console.log('Search and Error Component Initialized');
-    console.log('searchResults:', this.searchResults);
-    this.searchResults.companyDetails = {};
-    const path = this.route.snapshot.routeConfig?.path;
-    console.log('path:', path);
-    
-    if (path === 'search/:symbol') {
-      const symbol = this.route.snapshot.params['symbol'];
-      console.log('symbol:', symbol);
+    //console.log('searchResults:', this.searchResults);
+
+    const symbol = this.route.snapshot.paramMap.get('symbol');
+    console.log('symbol:', symbol);
+    if (symbol) {
       this.searchQuery = symbol;
       const results = this.searchResultsService.getResults();
       if (results) {
@@ -86,7 +68,22 @@ export class SearchAndErrorComponent {
       } else {
         this.executeSearch();
       }
+    } else {
+      this.searchResults.companyDetails = {};
     }
+
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      filter(() => this.route.snapshot.paramMap.has('symbol'))
+    ).subscribe(() => {
+      const symbol = this.route.snapshot.paramMap.get('symbol');
+      console.log('Symbol:', symbol);
+      console.log('Search Query:', this.searchQuery);
+      if (symbol !== null && symbol !== this.searchQuery) {
+        this.searchQuery = symbol;
+        this.executeSearch();
+      }
+    });
   }
 
   onSearch() {
@@ -94,22 +91,33 @@ export class SearchAndErrorComponent {
     console.log('onSearch');
     if (this.errorMessage !== 'Please enter a valid ticker') {
       this.searchBarService.getAllDetails(this.searchQuery).subscribe(data => {
-        this.searchResults.companyDetails = data[0];
-        this.searchResults.companyQuote = data[1];
-        this.searchResults.companyNews = data[2];
-        this.searchResults.companyRecommendations = data[3];
-        this.searchResults.companySentiments = data[4];
-        this.searchResults.companyPeers = data[5];
-        this.searchResults.companyEarnings = data[6];
-        this.searchResults.companyCharts = data[7];
+        this.searchResults.companyDetails = this.formatNumbersInObject(data[0]);
+        this.searchResults.companyQuote = this.formatNumbersInObject(data[1]);
+        this.searchResults.companyNews = data[2]; // Assuming this is not numeric data
+        this.searchResults.companyRecommendations = this.formatNumbersInObject(data[3]);
+        this.searchResults.companySentiments = this.formatNumbersInObject(data[4]);
+        this.searchResults.companyPeers = data[5]; // Assuming this is not numeric data
+        this.searchResults.companyEarnings = this.formatNumbersInObject(data[6]);
+        this.searchResults.companyCharts = this.formatNumbersInObject(data[7]);
+        this.searchResults.companyHourlyCharts = this.formatNumbersInObject(data[8]);
         if (Object.keys(this.searchResults.companyDetails).length === 0) {
           this.errorMessage = 'No data found. Please enter a valid ticker';
           console.log('Error Message: ', this.errorMessage);
         } else {
+          console.log('Setting search results');
           this.searchResultsService.setResults(this.searchResults, this.searchQuery);
         }
       });
     }
+  }
+
+  formatNumbersInObject(obj: any) {
+    for (let key in obj) {
+      if (typeof obj[key] === 'number') {
+        obj[key] = parseFloat(obj[key].toFixed(2));
+      }
+    }
+    return obj;
   }
 
   executeSearch() {
@@ -130,11 +138,22 @@ export class SearchAndErrorComponent {
   onSearchInput() {
     // Implement the logic to fetch autocomplete suggestions based on the searchQuery
     // Make an HTTP call to the autocomplete API endpoint
-    // this.searchBarService.searchCompanies(this.searchQuery).subscribe((data: any) => {
-    //   this.autocompleteSuggestions = data.filter((suggestion: any) => !suggestion.symbol.includes('.'));
-    //   this.showAutocomplete = true;
-    //   console.log(this.autocompleteSuggestions);
-    // });
+    if (this.searchQuery.length > 0) {
+      console.log('Search Query:', this.searchQuery);
+      console.log('Fetching autocomplete suggestions');
+      this.isLoading = true; // Add the 'isLoading' property to the class
+      console.log(this.isLoading);
+      this.searchBarService.searchCompanies(this.searchQuery).subscribe((data: any) => {
+        this.autocompleteSuggestions = data.filter((suggestion: any) => (!suggestion.symbol.includes('.') && suggestion.type.includes('Common Stock')));
+        //this.showAutocomplete = true;
+        this.isLoading = false; // Set 'isLoading' to false after the data is fetched
+        console.log(this.isLoading);
+      });
+    } else {
+      this.autocompleteSuggestions = [];
+      //this.showAutocomplete = false;
+    }
+    
     // console.log(this.searchQuery);
   }
 

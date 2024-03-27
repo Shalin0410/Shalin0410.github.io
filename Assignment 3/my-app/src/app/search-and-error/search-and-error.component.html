@@ -3,31 +3,50 @@
         <div class="col col-md-3"></div>
         <div class="col-10 col-md-6">
             <p class="text-center fs-2">STOCK SEARCH</p>
-            <div class="search-bar">
-                    <mat-form-field class="search-input">
-                        <input 
-                        matInput
-                        type="text"
-                        placeholder="Enter stock ticker symbol" 
-                        [(ngModel)]="searchQuery"
-                        name="searchQuery" 
-                        (input)="onSearchInput()"
-                        (keyup.enter)="executeSearch()">
-                        <mat-icon matSuffix (click)="executeSearch()">search</mat-icon>
-                        <mat-icon matSuffix (click)="clearResults()">close</mat-icon>
-                    </mat-form-field>
-                    <div *ngIf="showAutocomplete">
-                            <mat-option *ngFor="let suggestion of autocompleteSuggestions" (click)="selectSuggestion(suggestion)">
-                                {{ suggestion.symbol }} | {{ suggestion.description }}
-                            </mat-option>
+            <div class="search-bar border border-3 rounded">
+                <div class="search-input input-group p-1">
+                    <input
+                    class="form-control p-1"
+                    style="border: none; outline: none; box-shadow: none;"
+                    matInput
+                    type="text"
+                    placeholder="Enter stock ticker symbol" 
+                    [(ngModel)]="searchQuery"
+                    (ngModelChange)="onSearchInput()"
+                    (keyup.enter)="executeSearch()"
+                    [matAutocomplete]="auto">
+                    <div class="icon-wrapper">
+                        <mat-icon class="m-1" matSuffix (click)="executeSearch()">search</mat-icon>
+                        <mat-icon class="m-1" matSuffix (click)="clearResults()">close</mat-icon>
                     </div>
+                    <mat-autocomplete #auto="matAutocomplete">
+                        <mat-option *ngIf="isLoading">
+                          <mat-spinner diameter="30"></mat-spinner>
+                        </mat-option>
+                        <div *ngIf="!isLoading">
+                            <mat-option *ngFor="let suggestion of autocompleteSuggestions" (click)="selectSuggestion(suggestion)">
+                            {{ suggestion.symbol }} | {{ suggestion.description }}
+                            </mat-option>
+                        </div>
+                    </mat-autocomplete>
+                </div>
+                <!-- <div *ngIf="showAutocomplete" style="position: absolute; width: 100%; z-index: 1; background-color:white">
+                    <div *ngIf="isLoading">
+                        <mat-spinner class="spinner"></mat-spinner>
+                    </div>
+                    <div *ngIf="!isLoading && !isEmpty(autocompleteSuggestions)">
+                        <mat-option *ngFor="let suggestion of autocompleteSuggestions" (click)="selectSuggestion(suggestion)">
+                            {{ suggestion.symbol }} | {{ suggestion.description }}
+                        </mat-option>
+                    </div>
+                </div> -->
             </div>
         </div>
         <div class="col col-md-3"></div>
     </div>
 </div>
 <!-- <app-search-bar (searchEvent)="onSearch($event)"></app-search-bar> -->
-<div *ngIf="errorMessage">
+<div *ngIf="isEmpty(searchResults.companyDetails) && errorMessage">
     <ngb-alert class="d-flex justify-content-center mx-5" type="danger" (closed)="close()">
         <div>
             {{ errorMessage }}
@@ -35,5 +54,5 @@
     </ngb-alert>
 </div>
 <!-- <app-error-message *ngIf="errorMessage" [message]="errorMessage"></app-error-message> -->
-<app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults"></app-company-details>
+<app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults" [searchQuery]="searchQuery"></app-company-details>
 

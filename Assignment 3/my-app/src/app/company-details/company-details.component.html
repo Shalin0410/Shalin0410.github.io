@@ -1,52 +1,55 @@
 <div class="container" *ngIf="searchResults">
     <div class="row">
-        <div class="col-md-1"></div>
-        <div class="col-12 col-md-10">
+        <div class="col-12">
             <div class="row">
-                <div class="col-5 col-md-4 justify-content-center">
-                    <div class="d-flex justify-content-center fs-3"> {{ searchResults.companyDetails.ticker }}
+                <div class="col-5 col-md-4 justify-content-center" style="padding-left: 0px;">
+                    <div class="d-flex justify-content-center fs-4"> {{ searchResults.companyDetails.ticker }}
                         <span>
                             <i class="bi bi-star m-2" style="font-size: inherit;"></i>
                         </span>
                     </div>
-                    <h3 class="text-center fs-4" style="color: grey;">{{ searchResults.companyDetails.name }}</h3>
+                    <h3 class="text-center fs-5" style="color: grey;">{{ searchResults.companyDetails.name }}</h3>
                     <p class="text-center"><small>{{ searchResults.companyDetails.exchange }}</small></p>
                     <div class="d-flex justify-content-center">
                         <button type="button" class="btn btn-success" style="margin-right: 5px;">Buy</button>
                         <button type="button" class="btn btn-danger" style="margin-left: 5px;">Sell</button>
                     </div>
                 </div>
-                <div class="col-2 col-md d-flex align-items-center flex-column">
+                <div class="col-2 col-md d-flex align-items-center flex-column" style="padding-left: 0px;">
                     <img class="logo" src="{{ searchResults.companyDetails.logo }}" alt="Company Logo">
                 </div>
-                <div class="col-5 col-md-4" style="font-weight: 600;">
-                    <p *ngIf="searchResults.companyQuote.d < 0" class="fs-2 text-center text-danger">
+                <div class="col-5 col-md-4" style="font-weight: 500; padding-left: 0px;">
+                    <div *ngIf="searchResults.companyQuote.d < 0" class="fs-3 text-center text-danger">
                         {{searchResults.companyQuote.c}}
                         <br>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                            <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
-                        </svg>
-                        {{searchResults.companyQuote.d}} ({{searchResults.companyQuote.dp}}%)
-                    </p>
-                    <p *ngIf="searchResults.companyQuote.d >= 0" class="fs-2 text-center text-success mb-n5">
+                        <div class="d-flex fs-5 justify-content-center align-items-center mb-2">
+                            <i class="bi bi-caret-down-fill me-1" style="font-size: 15px;"></i>
+                            <small class="d-flex fs-5">
+                                <span class="me-2">{{searchResults.companyQuote.d}}</span> <span>({{searchResults.companyQuote.dp}}%)</span>
+                            </small>
+                        </div>
+                    </div>
+                    <div *ngIf="searchResults.companyQuote.d >= 0" class="fs-2 text-center text-success">
                         {{searchResults.companyQuote.c}}
                         <br>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-caret-up-fill" viewBox="0 0 16 16">
-                            <path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z"/>
-                        </svg>
-                        <small>{{searchResults.companyQuote.d}} ({{searchResults.companyQuote.dp}}%)</small>
-                    </p>
+                        <div class="d-flex fs-5 justify-content-center align-items-center mb-2">
+                            <i class="bi bi-caret-up-fill me-1" style="font-size: 15px;"></i>
+                            <small class="d-flex fs-4">
+                                <span class="me-2">{{searchResults.companyQuote.d}}</span> <span>({{searchResults.companyQuote.dp}}%)</span>
+                            </small>
+                        </div>
+                    </div>
                     <p class="text-center fs-6 fw-normal"><small>{{convertDate(searchResults.companyQuote.t)}}</small></p>
 
                 </div>
             </div>
-            <p class="fw-bold {{marketColor}} align-items-end text-center mt-3">{{market}} on {{convertDate(searchResults.companyQuote.t)}}</p>
-            <mat-tab-group class="mt-5">
+            <p class="fw-bold {{marketColor}} align-items-end text-center mt-3">{{market}}</p>
+            <mat-tab-group dynamicHeight class="mt-5">
                 <mat-tab label="Summary">
                     <app-summary [searchResults]="searchResults"></app-summary>
                 </mat-tab>
                 <mat-tab label="Top News">
-                    <app-top-news></app-top-news>
+                    <app-top-news [searchResults]="searchResults"></app-top-news>
                 </mat-tab>
                 <mat-tab label="Charts">
                     <app-charts></app-charts>
@@ -55,7 +58,5 @@
                     <app-insights></app-insights>
                 </mat-tab>
             </mat-tab-group>
-        </div>
-        <div class="col-md-1"></div>
-    
+        </div>    
 </div>

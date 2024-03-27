@@ -19,7 +19,8 @@ export class SearchBarService {
       companySentiments: null,
       companyPeers: null,
       companyEarnings: null,
-      companyCharts: null
+      companyCharts: null,
+      companyHourlyCharts: null
     };
   }
 
@@ -42,7 +43,7 @@ export class SearchBarService {
   }
 
   getAllDetails(symbol: string) {
-    console.log('getAllDetails');
+    console.log('getAllDetails'); 
     console.log(symbol);
     const companyDetails = this.http.get(`${this.apiUrl}/search/${symbol}`).pipe(catchError(error => of({})));
     const companyQuote = this.http.get(`${this.apiUrl}/quote/${symbol}`).pipe(catchError(error => of({})));
@@ -52,7 +53,12 @@ export class SearchBarService {
     const companyPeers = this.http.get(`${this.apiUrl}/peers/${symbol}`).pipe(catchError(error => of({})));
     const companyEarnings = this.http.get(`${this.apiUrl}/earnings/${symbol}`).pipe(catchError(error => of({})));
     const companyCharts = this.http.get(`${this.apiUrl}/charts/${symbol}`).pipe(catchError(error => of({})));
-    return forkJoin([companyDetails, companyQuote, companyNews, companyRecommendations, companySentiments, companyPeers, companyEarnings, companyCharts]);
+    const companyHourlyCharts = this.http.get(`${this.apiUrl}/hourlyCharts/${symbol}`).pipe(catchError(error => of({})));
+    return forkJoin([companyDetails, companyQuote, companyNews, companyRecommendations, companySentiments, companyPeers, companyEarnings, companyCharts, companyHourlyCharts]);
   }
 
+  getCompanyQuote(symbol: string) {
+    return this.http.get(`${this.apiUrl}/quote/${symbol}`);
+  }
+  
 }

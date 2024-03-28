@@ -37,7 +37,12 @@ export class CompanyDetailsComponent {
   constructor(private searchBarService: SearchBarService) {}
 
   ngOnInit() {
-    this.subscription = interval(150000000).subscribe(() => {
+    this.searchBarService.getCompanyQuote(this.searchQuery).subscribe(companyQuote => {
+      console.log('Received companyQuote');
+      this.searchResults.companyQuote = this.formatNumbersInObject(companyQuote);
+      this.checkMarketStatus();
+    });
+    this.subscription = interval(1500000).subscribe(() => {
       console.log('Checking market status');
       console.log('searchQuery:', this.searchQuery);
       this.searchBarService.getCompanyQuote(this.searchQuery).subscribe(companyQuote => {

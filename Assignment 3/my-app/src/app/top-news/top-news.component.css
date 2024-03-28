@@ -1,0 +1,22 @@
+.card .img-container {
+    position: relative;
+    width: 100%;
+    padding-top: 65%; /* for an aspect ratio of 4:3 - adjust as needed */
+  }
+  
+  .card img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .card-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }

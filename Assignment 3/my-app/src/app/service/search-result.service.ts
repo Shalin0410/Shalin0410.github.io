@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class SearchResultsService {
   private results: any;
-  private lastSearchedToken: string = '';
+  private lastSearchedToken: string = 'home';
 
   setResults(results: any, token: string) {
     //console.log('setResults:', results);

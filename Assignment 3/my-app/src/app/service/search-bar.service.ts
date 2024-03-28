@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http'; // Import the HttpClient modu
 })
 export class SearchBarService {
   private apiUrl = 'http://localhost:3000';
-  public currentSearchQuery: string = '';
+  public currentSearchQuery: string = 'home';
   private searchResults: any;
 
   constructor(private http: HttpClient) { 

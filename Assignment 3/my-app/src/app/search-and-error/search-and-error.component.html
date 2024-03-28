@@ -30,22 +30,11 @@
                         </div>
                     </mat-autocomplete>
                 </div>
-                <!-- <div *ngIf="showAutocomplete" style="position: absolute; width: 100%; z-index: 1; background-color:white">
-                    <div *ngIf="isLoading">
-                        <mat-spinner class="spinner"></mat-spinner>
-                    </div>
-                    <div *ngIf="!isLoading && !isEmpty(autocompleteSuggestions)">
-                        <mat-option *ngFor="let suggestion of autocompleteSuggestions" (click)="selectSuggestion(suggestion)">
-                            {{ suggestion.symbol }} | {{ suggestion.description }}
-                        </mat-option>
-                    </div>
-                </div> -->
             </div>
         </div>
         <div class="col col-md-3"></div>
     </div>
 </div>
-<!-- <app-search-bar (searchEvent)="onSearch($event)"></app-search-bar> -->
 <div *ngIf="isEmpty(searchResults.companyDetails) && errorMessage">
     <ngb-alert class="d-flex justify-content-center mx-5" type="danger" (closed)="close()">
         <div>
@@ -53,6 +42,5 @@
         </div>
     </ngb-alert>
 </div>
-<!-- <app-error-message *ngIf="errorMessage" [message]="errorMessage"></app-error-message> -->
 <app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults" [searchQuery]="searchQuery"></app-company-details>
 

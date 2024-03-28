@@ -18,32 +18,21 @@ export class TopNewsComponent {
 
   ngOnInit() {
     console.log('Top News Component Initialized');
-    this.filteredNews();
   }
 
-  filteredNews() {
-    let counter = 0;
-    while (counter < 20){
-      if (this.searchResults.companyNews[counter].image !== "" && this.searchResults.companyNews[counter].image !== null){
-        this.selectedNews.push(this.searchResults.companyNews[counter]);
-        counter++;
-      }
-    }
-  }
-
-  openModal(content: any, news: any) {
-    this.currentNews = news;
-    this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
-      // handle close result
-    }, (reason) => {
-      // handle dismiss reason
-      if (reason === ModalDismissReasons.ESC) {
-        console.log('Modal closed with ESC');
-      } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-        console.log('Modal closed with backdrop click');
-      }
-    });
-  }
+  // open(news: any, content: any) {
+  //   this.currentNews = news;
+  //   this.modalService.open(content, {ariaLabelledBy: 'modal-basic-title'}).result.then((result) => {
+  //     // handle close result
+  //   }, (reason) => {
+  //     // handle dismiss reason
+  //     if (reason === ModalDismissReasons.ESC) {
+  //       console.log('Modal closed with ESC');
+  //     } else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
+  //       console.log('Modal closed with backdrop click');
+  //     }
+  //   });
+  // }
 
 }
 

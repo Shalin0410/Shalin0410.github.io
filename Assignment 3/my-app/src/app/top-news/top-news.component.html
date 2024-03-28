@@ -1,35 +1,35 @@
 <div class="container-fluid mt-2">
     <div class="row">
-        <div class="col-12 col-md-6">
-            <div *ngFor="let news of selectedNews.slice(0, selectedNews.length / 2)">
-                <div class="card mb-3" style="max-width: 540px;">
-                    <div class="row g-0">
-                      <div class="col-md-4">
-                        <img [src]="news.image" class="img-fluid rounded-start" alt="news image">
+        <div class="col-12 col-md-6 d-flex flex-column ">
+            <div *ngFor="let news of searchResults.companyNews.slice(0, searchResults.companyNews.length / 2)">
+                <div class="card my-3">
+                    <div class="row g-0 col">
+                      <div class="col-md-4 p-3">
+                        <div class="img-container">
+                          <img [src]="news.image" class="img-fluid rounded" alt="news image">
+                        </div>
                       </div>
-                      <div class="col-md-8">
+                      <div class="col-md-8 d-flex justify-content-center align-items-center">
                         <div class="card-body">
-                          <h5 class="card-title">{{news.title}}</h5>
-                          <p class="card-text">{{news.description}}</p>
-                          <p class="card-text"><small class="text-muted">Last updated {{news.updatedAt}}</small></p>
+                          <p class="card-text text-center">{{news.headline}}</p>
                         </div>
                       </div>
                     </div>
                   </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
-            <div *ngFor="let news of selectedNews.slice(selectedNews.length / 2)">
-                <div class="card mb-3" style="max-width: 540px;">
+        <div class="col-12 col-md-6 d-flex flex-column">
+            <div *ngFor="let news of searchResults.companyNews.slice(searchResults.companyNews.length / 2)">
+                <div class="card my-3">
                     <div class="row g-0">
-                      <div class="col-md-4">
-                        <img [src]="news.image" class="img-fluid rounded-start" alt="news image">
+                      <div class="col-md-4 p-3">
+                        <div class="img-container">
+                          <img [src]="news.image" class="img-fluid rounded" alt="news image">
+                        </div>
                       </div>
-                      <div class="col-md-8">
+                      <div class="col-md-8 d-flex justify-content-center align-items-center">
                         <div class="card-body">
-                          <h5 class="card-title">{{news.title}}</h5>
-                          <p class="card-text">{{news.description}}</p>
-                          <p class="card-text"><small class="text-muted">Last updated {{news.updatedAt}}</small></p>
+                          <p class="card-text text-center">{{news.headline}}</p>
                         </div>
                       </div>
                     </div>
@@ -39,21 +39,21 @@
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="newsModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+ <!-- Modal  -->
+<!-- <div class="modal fade" #newsModal tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">{{currentNews.title}}</h5>
+          <h5 class="modal-title" id="exampleModalLabel">{{currentNews.headline}}</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          {{currentNews.description}}
+          {{currentNews.summary}}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <a [href]="selectedNews.url" target="_blank">For more details click here</a>
+          <a [href]="currentNews.url" target="_blank">For more details click here</a>
         </div>
       </div>
     </div>
-  </div>
+</div> -->

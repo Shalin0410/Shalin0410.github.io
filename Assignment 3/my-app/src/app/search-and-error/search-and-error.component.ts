@@ -26,9 +26,9 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
     MatIconModule, 
     MatInputModule, 
     MatFormFieldModule, 
-    CompanyDetailsComponent,
     NgbAlertModule,
-    MatProgressSpinnerModule],
+    MatProgressSpinnerModule,
+    CompanyDetailsComponent],
   templateUrl: './search-and-error.component.html',
   styleUrl: './search-and-error.component.css'
 })
@@ -57,7 +57,6 @@ export class SearchAndErrorComponent {
     this.errorMessage = '';
     console.log('Search and Error Component Initialized');
     //console.log('searchResults:', this.searchResults);
-
     const symbol = this.route.snapshot.paramMap.get('symbol');
     console.log('symbol:', symbol);
     if (symbol) {
@@ -93,7 +92,9 @@ export class SearchAndErrorComponent {
       this.searchBarService.getAllDetails(this.searchQuery).subscribe(data => {
         this.searchResults.companyDetails = this.formatNumbersInObject(data[0]);
         this.searchResults.companyQuote = this.formatNumbersInObject(data[1]);
-        this.searchResults.companyNews = data[2]; // Assuming this is not numeric data
+        this.searchResults.companyNews = (data[2] as Array<any>)
+        .filter(news => news.image && news.image !== "")
+        .slice(0, 20);
         this.searchResults.companyRecommendations = this.formatNumbersInObject(data[3]);
         this.searchResults.companySentiments = this.formatNumbersInObject(data[4]);
         this.searchResults.companyPeers = data[5]; // Assuming this is not numeric data
@@ -138,7 +139,7 @@ export class SearchAndErrorComponent {
   onSearchInput() {
     // Implement the logic to fetch autocomplete suggestions based on the searchQuery
     // Make an HTTP call to the autocomplete API endpoint
-    if (this.searchQuery.length > 0) {
+    if (this.searchQuery && this.searchQuery.length > 0) {
       console.log('Search Query:', this.searchQuery);
       console.log('Fetching autocomplete suggestions');
       this.isLoading = true; // Add the 'isLoading' property to the class

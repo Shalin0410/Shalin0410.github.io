@@ -12,6 +12,7 @@
                     type="text"
                     placeholder="Enter stock ticker symbol" 
                     [(ngModel)]="searchQuery"
+                    (input)="onSearchInput()"
                     (ngModelChange)="onSearchInput()"
                     (keyup.enter)="executeSearch()"
                     [matAutocomplete]="auto">
@@ -42,5 +43,5 @@
         </div>
     </ngb-alert>
 </div>
-<app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults" [searchQuery]="searchQuery"></app-company-details>
+<app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults"></app-company-details>
 

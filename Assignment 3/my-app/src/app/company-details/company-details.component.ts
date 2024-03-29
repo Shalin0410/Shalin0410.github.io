@@ -28,7 +28,6 @@ import { interval } from 'rxjs';
 })
 export class CompanyDetailsComponent {
   @Input() searchResults: any;
-  @Input() searchQuery: string = '';
   market: string = '';
   intervalId: any;
   marketColor: string = '';
@@ -37,15 +36,17 @@ export class CompanyDetailsComponent {
   constructor(private searchBarService: SearchBarService) {}
 
   ngOnInit() {
-    this.searchBarService.getCompanyQuote(this.searchQuery).subscribe(companyQuote => {
+    console.log('Company Details Component Initialized');
+    console.log('searchResults:', this.searchResults.companyDetails.ticker);
+    this.searchBarService.getCompanyQuote(this.searchResults.companyDetails.ticker).subscribe(companyQuote => {
       console.log('Received companyQuote');
       this.searchResults.companyQuote = this.formatNumbersInObject(companyQuote);
       this.checkMarketStatus();
     });
     this.subscription = interval(1500000).subscribe(() => {
       console.log('Checking market status');
-      console.log('searchQuery:', this.searchQuery);
-      this.searchBarService.getCompanyQuote(this.searchQuery).subscribe(companyQuote => {
+      console.log('searchQuery:', this.searchResults);
+      this.searchBarService.getCompanyQuote(this.searchResults).subscribe(companyQuote => {
         console.log('Received companyQuote');
         this.searchResults.companyQuote = this.formatNumbersInObject(companyQuote);
         this.checkMarketStatus();
@@ -96,4 +97,19 @@ export class CompanyDetailsComponent {
     const formattedDate = date.getFullYear() + '-' + ('0' + (date.getMonth() + 1)).slice(-2) + '-' + ('0' + date.getDate()).slice(-2) + ' ' + ('0' + date.getHours()).slice(-2) + ':' + ('0' + date.getMinutes()).slice(-2) + ':' + ('0' + date.getSeconds()).slice(-2);
     return formattedDate;
   }
+
+  buyStock() {
+    // Implement your logic for buying a stock here
+  }
+
+  sellStock() {
+    // Implement your logic for selling a stock here
+  }
+
+  portfolioHasStock(): boolean {
+    // Implement your logic for checking if the portfolio has the current stock
+    // For now, let's return false
+    return false;
+  }
 }
+

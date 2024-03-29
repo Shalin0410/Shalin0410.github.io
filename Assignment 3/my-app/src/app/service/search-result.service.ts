@@ -1,26 +1,18 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SearchResultsService {
-  private results: any;
-  private lastSearchedToken: string = 'home';
+  private searchResultsSubject = new BehaviorSubject<any>(null);
+  public stateValue = this.searchResultsSubject.asObservable();
 
-  setResults(results: any, token: string) {
-    //console.log('setResults:', results);
-    console.log('setResults token:', token);
-    this.results = results;
-    this.lastSearchedToken = token;
-    console.log('setResults lastSearchedToken:', this.lastSearchedToken);
+  setResults(results: any) {
+    this.searchResultsSubject.next(results);
   }
 
-  getResults() {
-    return this.results;
-  }
-
-  getLastSearchedToken() {
-    //console.log('getLastSearchedToken:', this.lastSearchedToken);
-    return this.lastSearchedToken;
+  getResults(): any {
+    return this.searchResultsSubject.getValue();
   }
 }

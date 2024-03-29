@@ -20,7 +20,8 @@ export class SearchBarService {
       companyPeers: null,
       companyEarnings: null,
       companyCharts: null,
-      companyHourlyCharts: null
+      companyHourlyCharts: null,
+      companyWatchlist: null
     };
   }
 
@@ -54,7 +55,8 @@ export class SearchBarService {
     const companyEarnings = this.http.get(`${this.apiUrl}/earnings/${symbol}`).pipe(catchError(error => of({})));
     const companyCharts = this.http.get(`${this.apiUrl}/charts/${symbol}`).pipe(catchError(error => of({})));
     const companyHourlyCharts = this.http.get(`${this.apiUrl}/hourlyCharts/${symbol}`).pipe(catchError(error => of({})));
-    return forkJoin([companyDetails, companyQuote, companyNews, companyRecommendations, companySentiments, companyPeers, companyEarnings, companyCharts, companyHourlyCharts]);
+    const companyWatchlist = this.http.get(`${this.apiUrl}/watchlist/${symbol}`).pipe(catchError(error => of({}))); // Fix: Added closing parenthesis
+    return forkJoin([companyDetails, companyQuote, companyNews, companyRecommendations, companySentiments, companyPeers, companyEarnings, companyCharts, companyHourlyCharts, companyWatchlist]);
   }
 
   getCompanyQuote(symbol: string) {

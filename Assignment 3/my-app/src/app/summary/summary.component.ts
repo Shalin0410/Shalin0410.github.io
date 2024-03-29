@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { SearchResultsService } from '../service/search-result.service';
 import * as Highcharts from 'highcharts';
 import indicators from 'highcharts/indicators/indicators';
 import volumeByPrice from 'highcharts/indicators/volume-by-price';

@@ -6,6 +6,11 @@ app.use(cors({ origin: 'http://localhost:4200' }));
 const port = 3000;
 const API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0';
 
+const { MongoClient } = require('mongodb');
+const uri = 'mongodb+srv://shalinshah1998:vKkqoTACCiUfLSUm@stockapplication.clfuiyi.mongodb.net/?retryWrites=true&w=majority&appName=stockApplication';
+const dbName = 'stockApplication';
+
+const client = new MongoClient(uri);
 // Home Route
 // app.get('/', (req, res) => {
 //   res.redirect('/search/home');
@@ -214,16 +219,41 @@ app.get('/hourlyCharts/:symbol', async (req, res) => {
 });
 
 // Watchlist Route
-app.get('/watchlist', (req, res) => {
-  // Placeholder for watchlist implementation
-  res.send('Watchlist Route');
+app.get('/watchlist', async (req, res) => {
+  try {
+    client.connect();
+    const db = client.db(dbName);
+    console.log('Connected to MongoDB');
+    const watchlist = db.collection('watchlist');
+    const stocks = watchlist.find({}).toArray();
+    console.log('Stocks: ', stocks);
+    res.json(stocks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to fetch watchlist' });
+  }
 });
 
-// Portfolio Route
-app.get('/portfolio', (req, res) => {
-  // Placeholder for portfolio implementation
-  res.send('Portfolio Route');
-});
+// // Portfolio Route
+// app.get('/portfolio', (req, res) => {
+//   // Placeholder for portfolio implementation
+//   res.send('Portfolio Route');
+// });
+
+// async function getStocks() {
+//   try {
+//     await client.connect();
+//     const db = client.db(dbName);
+//     console.log('Connected to MongoDB');
+//     const tradingStocks = db.collection('tradingStocks');
+//     const stocks = await tradingStocks.find({}).toArray();
+//     console.log('Stocks: ', stocks[0].wallet);
+//     return stocks;
+//   } finally {
+//     await client.close();
+//   }
+// }
+// getStocks().catch(console.dir);
 
 // Start the server
 app.listen(port, () => {

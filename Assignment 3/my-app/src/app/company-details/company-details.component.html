@@ -11,8 +11,8 @@
                     <h3 class="text-center fs-5" style="color: grey;">{{ searchResults.companyDetails.name }}</h3>
                     <p class="text-center"><small>{{ searchResults.companyDetails.exchange }}</small></p>
                     <div class="d-flex justify-content-center">
-                        <button type="button" class="btn btn-success" style="margin-right: 5px;">Buy</button>
-                        <button type="button" class="btn btn-danger" style="margin-left: 5px;">Sell</button>
+                        <button (click)="buyStock()" type="button" class="btn btn-success" style="margin-right: 5px;">Buy</button>
+                        <button *ngIf="portfolioHasStock()" (click)="sellStock()" type="button" class="btn btn-danger" style="margin-left: 5px;">Sell</button>
                     </div>
                 </div>
                 <div class="col-2 col-md d-flex align-items-center flex-column" style="padding-left: 0px;">

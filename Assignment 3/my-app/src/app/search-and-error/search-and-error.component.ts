@@ -10,14 +10,14 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {Router, NavigationEnd} from '@angular/router';
 import {NgbAlertModule} from '@ng-bootstrap/ng-bootstrap';
 import { SearchBarService } from '../service/search-bar.service';
-import {SearchResultsService} from '../service/search-result.service';
+import { SearchResultsService } from '../service/search-result.service';
 import { filter } from 'rxjs/operators';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-search-and-error',
   standalone: true,
-  providers: [SearchBarService, SearchResultsService],
+  providers: [SearchBarService],
   imports: [
     FormsModule, 
     CommonModule, 
@@ -35,17 +35,18 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 export class SearchAndErrorComponent {
   searchQuery: string = '';
   autocompleteSuggestions: any[] = [];
-  searchResults: any = {
-    companyDetails: {},
-    companyQuote: {},
-    companyNews: {},
-    companyRecommendations: {},
-    companySentiments: {},
-    companyPeers: {},
-    companyEarnings: {},
-    companyCharts: {},
-    companyHourlyCharts: {}
-  };
+  // searchResults: any = {
+  //   companyDetails: {},
+  //   companyQuote: {},
+  //   companyNews: {},
+  //   companyRecommendations: {},
+  //   companySentiments: {},
+  //   companyPeers: {},
+  //   companyEarnings: {},
+  //   companyCharts: {},
+  //   companyHourlyCharts: {}
+  // };
+  searchResults: any;
   showAutocomplete: boolean = false;
   errorMessage: string = '';
   isLoading: boolean = false;
@@ -55,34 +56,29 @@ export class SearchAndErrorComponent {
 
   ngOnInit() {
     this.errorMessage = '';
-    console.log('Search and Error Component Initialized');
-    //console.log('searchResults:', this.searchResults);
-    const symbol = this.route.snapshot.paramMap.get('symbol');
-    console.log('symbol:', symbol);
-    if (symbol) {
-      this.searchQuery = symbol;
-      const results = this.searchResultsService.getResults();
-      if (results) {
-        this.searchResults = results;
+    this.searchResultsService.stateValue.subscribe((state: any) => {
+      console.log('Search and Error Component State:', state);
+      if (state) {
+        this.searchResults = state;
+        this.searchQuery = state.companyDetails.ticker;
+        this.router.navigate(['/search', this.searchQuery]);
+        console.log('NgOnInit Search Query:', this.searchQuery);
       } else {
-        this.executeSearch();
-      }
-    } else {
-      this.searchResults.companyDetails = {};
-    }
-
-    this.router.events.pipe(
-      filter((event) => event instanceof NavigationEnd),
-      filter(() => this.route.snapshot.paramMap.has('symbol'))
-    ).subscribe(() => {
-      const symbol = this.route.snapshot.paramMap.get('symbol');
-      console.log('Symbol:', symbol);
-      console.log('Search Query:', this.searchQuery);
-      if (symbol !== null && symbol !== this.searchQuery) {
-        this.searchQuery = symbol;
-        this.executeSearch();
+        this.searchResults = {
+          companyDetails: {},
+          companyQuote: {},
+          companyNews: {},
+          companyRecommendations: {},
+          companySentiments: {},
+          companyPeers: {},
+          companyEarnings: {},
+          companyCharts: {},
+          companyHourlyCharts: {}
+        };
       }
     });
+    console.log('Search and Error Component Initialized');
+    //console.log('searchResults:', this.searchResults);
   }
 
   onSearch() {
@@ -105,8 +101,8 @@ export class SearchAndErrorComponent {
           this.errorMessage = 'No data found. Please enter a valid ticker';
           console.log('Error Message: ', this.errorMessage);
         } else {
-          console.log('Setting search results');
-          this.searchResultsService.setResults(this.searchResults, this.searchQuery);
+          this.errorMessage = '';
+          this.searchResultsService.setResults(this.searchResults);
         }
       });
     }
@@ -131,8 +127,8 @@ export class SearchAndErrorComponent {
     } else {
       console.log(this.searchQuery);
       console.log('Routing to search page')
-      this.router.navigate(['/search', this.searchQuery]);
       this.onSearch();
+      this.router.navigate(['/search', this.searchQuery]);
     }
   }
 
@@ -171,9 +167,13 @@ export class SearchAndErrorComponent {
 
   selectSuggestion(suggestion: any) {
     // Implement the logic to select a suggestion from the autocomplete list
-    this.searchQuery = suggestion.symbol;
-    this.showAutocomplete = false;
+  console.log('Selected Suggestion:', suggestion);
+  this.searchQuery = suggestion.symbol;
+  this.showAutocomplete = false;
+  setTimeout(() => {
+    this.router.navigate(['/search', this.searchQuery], { queryParamsHandling: 'preserve' });
     this.executeSearch();
+  }, 0);
   }
 
   close() {

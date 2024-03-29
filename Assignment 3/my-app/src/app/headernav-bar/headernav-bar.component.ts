@@ -3,6 +3,9 @@ import { RouterModule } from '@angular/router';
 import { Router } from '@angular/router';
 import { SearchBarService } from '../service/search-bar.service';
 import { SearchResultsService } from '../service/search-result.service';
+import { state } from '@angular/animations';
+import { ActivatedRoute } from '@angular/router';
+
 
 @Component({
   selector: 'app-headernav-bar',
@@ -13,17 +16,46 @@ import { SearchResultsService } from '../service/search-result.service';
   styleUrl: './headernav-bar.component.css'
 })
 export class HeadernavBarComponent {
-  constructor(private router: Router, public searchResultsService: SearchResultsService) {}
+  currentStateSymbol: string = '';
+  constructor(private router: Router, private route: ActivatedRoute, private searchResultsService: SearchResultsService) {}
+
+
+
 
   ngOnInit() {
     console.log('Header Nav Bar Component Initialized');
+    this.searchResultsService.stateValue.subscribe((state: any) => {
+      console.log('Header Nav Bar Component State:', state);
+      if (state) {
+        console.log('We have a state');
+        this.currentStateSymbol = state;
+      } else {
+        console.log('No state');
+        this.currentStateSymbol = 'home';
+      }
+    });
   }
 
-  stateCheck() {
-    console.log('stateCheck');
-    console.log(this.router.url);
-
+  navigateToSearch(){
+    console.log('Navigating to search');
+    this.router.navigate(['/search', this.currentStateSymbol]);
   }
+
+  navigateToWatchlist(){
+    console.log('Navigating to watchlist');
+    this.router.navigate(['/watchlist']);
+  }
+
+  navigateToPortfolio(){
+    console.log('Navigating to portfolio');
+    this.router.navigate(['/portfolio']);
+  }
+  
+
+  // stateCheck() {
+  //   console.log('stateCheck');
+  //   console.log(this.router.url);
+  // }
 
   // searchWithSymbol() {
   //   console.log('searchWithSymbol');

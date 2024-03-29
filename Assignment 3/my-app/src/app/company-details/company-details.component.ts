@@ -1,6 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, inject, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NgbAlertModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbAlertModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { SearchAndErrorComponent } from '../search-and-error/search-and-error.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SearchBarService } from '../service/search-bar.service';
@@ -10,6 +10,7 @@ import { ChartsComponent } from '../charts/charts.component';
 import { InsightsComponent } from '../insights/insights.component';
 import { Subscription } from 'rxjs';
 import { interval } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-company-details',
@@ -21,7 +22,8 @@ import { interval } from 'rxjs';
     SummaryComponent, 
     TopNewsComponent, 
     ChartsComponent, 
-    InsightsComponent],
+    InsightsComponent,
+    FormsModule],
   providers: [SearchBarService],
   templateUrl: './company-details.component.html',
   styleUrl: './company-details.component.css'
@@ -31,7 +33,12 @@ export class CompanyDetailsComponent {
   market: string = '';
   intervalId: any;
   marketColor: string = '';
+  isInWatchlist: boolean = false;
   private subscription: Subscription = new Subscription();
+  private modalService = inject(NgbModal);
+	closeResult = '';
+  quantity: number = 0;
+  purchaseMessage: string = '';
 
   constructor(private searchBarService: SearchBarService) {}
 
@@ -43,6 +50,13 @@ export class CompanyDetailsComponent {
       this.searchResults.companyQuote = this.formatNumbersInObject(companyQuote);
       this.checkMarketStatus();
     });
+    if (this.searchResults.watchlist) {
+      this.searchResults.watchlist.forEach((ticker: any) => {
+        if (ticker === this.searchResults.companyDetails.ticker) {
+          this.isInWatchlist = true;
+        }
+      });
+    }
     this.subscription = interval(1500000).subscribe(() => {
       console.log('Checking market status');
       console.log('searchQuery:', this.searchResults);
@@ -111,5 +125,66 @@ export class CompanyDetailsComponent {
     // For now, let's return false
     return false;
   }
+
+  addToWatchlist() {
+    this.searchBarService.addToWatchlist(this.searchResults.companyDetails.ticker)
+    console.log('Added to watchlist');
+    this.isInWatchlist = true;
+  }
+
+  removeFromWatchlist() {
+    this.searchBarService.removeFromWatchlist(this.searchResults.companyDetails.ticker)
+    console.log('Removed from watchlist');
+    this.isInWatchlist = false;
+    // Implement your logic for removing the stock from the watchlist
+  }
+
+	open(content: TemplateRef<any>) {
+    this.purchaseMessage = '';
+		this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
+			(result) => {
+				this.closeResult = `Closed with: ${result}`;
+        console.log('Closed with: ', result);
+			}
+		);
+	}
+
+  purchaseStocks(quantity: number) {
+    // Validate the quantity
+    if (quantity <= 0) {
+      alert('Quantity must be greater than 0');
+      return;
+    }
+    // TODO: Implement the logic to purchase the stocks
+    // This could involve calling a service method to make a HTTP request to your server
+    this.purchaseMessage = `${this.searchResults.companyDetails.ticker} bought successfully`;
+    console.log(`Purchased ${quantity} stocks`);
+
+    setTimeout(() => {
+      this.close();
+    }, 5000);
+  }
+
+  totalPurchase() {
+    console.log('totalPurchase');
+    console.log(this.quantity);
+    console.log(this.searchResults.companyQuote.c);
+    return this.quantity * this.searchResults.companyQuote.c;
+  }
+
+  limitCheck() {
+    let limit = 25000;
+    let totalPurchase = this.totalPurchase();
+    if (totalPurchase > limit) {
+      return true;
+    }
+    return false;
+  }
+
+  close() {
+    this.purchaseMessage = '';
+  }
+
+  
 }
 

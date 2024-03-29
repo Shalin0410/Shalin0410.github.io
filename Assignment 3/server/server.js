@@ -7,10 +7,13 @@ const port = 3000;
 const API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0';
 
 const { MongoClient } = require('mongodb');
-const uri = 'mongodb+srv://shalinshah1998:vKkqoTACCiUfLSUm@stockapplication.clfuiyi.mongodb.net/?retryWrites=true&w=majority&appName=stockApplication';
+const uri = 'mongodb://localhost:27017';
+//'mongodb+srv://shalinshah1998:vKkqoTACCiUfLSUm@stockapplication.clfuiyi.mongodb.net/?retryWrites=true&w=majority&appName=stockApplication';
 const dbName = 'stockApplication';
-
 const client = new MongoClient(uri);
+client.connect();
+const db = client.db(dbName);
+console.log('Connected to MongoDB');
 // Home Route
 // app.get('/', (req, res) => {
 //   res.redirect('/search/home');
@@ -220,18 +223,70 @@ app.get('/hourlyCharts/:symbol', async (req, res) => {
 
 // Watchlist Route
 app.get('/watchlist', async (req, res) => {
-  try {
-    client.connect();
-    const db = client.db(dbName);
-    console.log('Connected to MongoDB');
-    const watchlist = db.collection('watchlist');
-    const stocks = watchlist.find({}).toArray();
-    console.log('Stocks: ', stocks);
-    res.json(stocks);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch watchlist' });
-  }
+  const userId = 'user_id'; // Replace with the actual user_id
+
+  // Get the watchlist collection
+  const watchlist = db.collection('watchlist');
+
+  // Find the document with the specified _id
+  watchlist.findOne({ _id: userId }, (err, doc) => {
+    if (err) {
+      console.error('Failed to retrieve watchlist. Error:', err);
+      res.status(500).send('Failed to retrieve watchlist');
+      return;
+    }
+    console.log('Retrieved watchlist:', doc);
+    res.status(200).json(doc);
+  });
+});
+
+
+app.put('/search/add/:symbol', async (req, res) => {
+  // Get the symbol from the URL parameters
+  const symbol = req.params.symbol;
+  //console.log('Symbol: ', symbol);
+  const userId = 'user_id';
+
+  const update = { $push: { symbols: symbol } };
+
+  // Get the watchlist collection
+  const watchlist = db.collection('watchlist');
+
+  // Update the document with the specified user_id
+  watchlist.updateOne({ _id: userId }, update, (err, result) => {
+    if (err) {
+      console.error('Failed to add to watchlist. Error:', err);
+      res.status(500).send('Failed to add to watchlist');
+      return;
+    }
+    console.log('Added to watchlist:', result);
+    res.status(200).send('Added to watchlist');
+  });
+});
+
+app.delete('/search/delete/:symbol', async (req, res) => {
+  // Get the symbol from the URL parameters
+  const symbol = req.params.symbol;
+
+  // Specify the user_id
+  const userId = 'user_id'; // Replace with the actual user_id
+
+  // Use the $pull operator to remove the symbol from the symbols array
+  const update = { $pull: { symbols: symbol } };
+
+  // Get the watchlist collection
+  const watchlist = db.collection('watchlist');
+
+  // Update the document with the specified user_id
+  watchlist.updateOne({ _id: userId }, update, (err, result) => {
+    if (err) {
+      console.error('Failed to remove from watchlist. Error:', err);
+      res.status(500).send('Failed to remove from watchlist');
+      return;
+    }
+    console.log('Removed from watchlist:', result);
+    res.status(200).send('Removed from watchlist');
+  });
 });
 
 // // Portfolio Route

@@ -1,3 +1,11 @@
+<div *ngIf="purchaseMessage">
+    <ngb-alert class="d-flex justify-content-center mx-2" type="success" (closed)="close()">
+        <div>
+            {{ purchaseMessage }}
+        </div>
+    </ngb-alert>
+</div>
+
 <div class="container" *ngIf="searchResults">
     <div class="row">
         <div class="col-12">
@@ -5,13 +13,14 @@
                 <div class="col-5 col-md-4 justify-content-center" style="padding-left: 0px;">
                     <div class="d-flex justify-content-center fs-4"> {{ searchResults.companyDetails.ticker }}
                         <span>
-                            <i class="bi bi-star m-2" style="font-size: inherit;"></i>
+                            <i *ngIf="!isInWatchlist" (click)="addToWatchlist()" class="bi bi-star m-2" style="font-size: inherit;"></i>
+                            <i *ngIf="isInWatchlist" (click)="removeFromWatchlist()" class="bi bi-star-fill m-2"  style="font-size: inherit; color: rgb(220, 220, 5);"></i>
                         </span>
                     </div>
                     <h3 class="text-center fs-5" style="color: grey;">{{ searchResults.companyDetails.name }}</h3>
                     <p class="text-center"><small>{{ searchResults.companyDetails.exchange }}</small></p>
                     <div class="d-flex justify-content-center">
-                        <button (click)="buyStock()" type="button" class="btn btn-success" style="margin-right: 5px;">Buy</button>
+                        <button (click)="open(buy)" type="button" class="btn btn-success" style="margin-right: 5px;">Buy</button>
                         <button *ngIf="portfolioHasStock()" (click)="sellStock()" type="button" class="btn btn-danger" style="margin-left: 5px;">Sell</button>
                     </div>
                 </div>
@@ -60,3 +69,28 @@
             </mat-tab-group>
         </div>    
 </div>
+
+
+<ng-template #buy let-modal>
+	<div class="modal-header">
+		<p class="modal-title fs-5" id="modal-basic-title">{{ searchResults.companyDetails.ticker }}</p>
+		<button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cross click')"></button>
+	</div>
+	<div class="modal-body">
+		<form>
+			<div>
+				<small>Current Price: {{searchResults.companyQuote.c}}</small> <br>
+                <small>Money in Wallet: $25000</small>
+            </div>
+            <div class="d-flex align-items-center">
+                <label for="quantity" style="padding-right: 5px">Quantity:</label>
+                <input type="number" id="quantity" name="quantity" class="form-control" min="0" [(ngModel)]="quantity">
+            </div>
+            <small *ngIf="limitCheck()" class="text-danger">Not enough money in wallet!</small>
+        </form>
+    </div>
+    <div class="modal-footer d-flex justify-content-between">
+        <small class="mr-auto">Total: {{ totalPurchase() }}</small>
+        <button type="button" class="btn btn-success" (click)="purchaseStocks(quantity); modal.close('Save click')">Buy</button>
+	</div>
+</ng-template>

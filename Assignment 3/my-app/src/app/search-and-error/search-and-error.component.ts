@@ -97,6 +97,7 @@ export class SearchAndErrorComponent {
         this.searchResults.companyEarnings = this.formatNumbersInObject(data[6]);
         this.searchResults.companyCharts = this.formatNumbersInObject(data[7]);
         this.searchResults.companyHourlyCharts = this.formatNumbersInObject(data[8]);
+        //this.searchResults.companyWatchlist = data[9];
         if (Object.keys(this.searchResults.companyDetails).length === 0) {
           this.errorMessage = 'No data found. Please enter a valid ticker';
           console.log('Error Message: ', this.errorMessage);

@@ -55,12 +55,20 @@ export class SearchBarService {
     const companyEarnings = this.http.get(`${this.apiUrl}/earnings/${symbol}`).pipe(catchError(error => of({})));
     const companyCharts = this.http.get(`${this.apiUrl}/charts/${symbol}`).pipe(catchError(error => of({})));
     const companyHourlyCharts = this.http.get(`${this.apiUrl}/hourlyCharts/${symbol}`).pipe(catchError(error => of({})));
-    const companyWatchlist = this.http.get(`${this.apiUrl}/watchlist/${symbol}`).pipe(catchError(error => of({}))); // Fix: Added closing parenthesis
-    return forkJoin([companyDetails, companyQuote, companyNews, companyRecommendations, companySentiments, companyPeers, companyEarnings, companyCharts, companyHourlyCharts, companyWatchlist]);
+    //const companyWatchlist = this.http.get(`${this.apiUrl}/watchlist/`).pipe(catchError(error => of({})));
+    return forkJoin([companyDetails, companyQuote, companyNews, companyRecommendations, companySentiments, companyPeers, companyEarnings, companyCharts, companyHourlyCharts]);
   }
 
   getCompanyQuote(symbol: string) {
     return this.http.get(`${this.apiUrl}/quote/${symbol}`);
+  }
+
+  addToWatchlist(symbol: string) {
+    return this.http.post(`${this.apiUrl}/search/add/${symbol}`, {});
+  }
+
+  removeFromWatchlist(symbol: string) {
+    return this.http.delete(`${this.apiUrl}/search/remove/${symbol}`);
   }
   
 }

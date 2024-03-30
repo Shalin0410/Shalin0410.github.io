@@ -1,1 +1,51 @@
-<p>watchlist works!</p>
+<div *ngIf="isLoading">
+    <mat-spinner diameter="30"></mat-spinner>
+</div>
+
+<div *ngIf="!isLoading">
+    <div *ngIf="watchlist.length === 0">
+        <ngb-alert class="d-flex justify-content-center m-5" [dismissible]="false" type="warning">
+            <div>
+                Currently, you don't have any stocks in your watchlist.
+            </div>
+        </ngb-alert>
+    </div>
+
+    <div *ngIf="watchlist.length !== 0">
+        <div class="container-fluid mt-3">
+            <div class="row">
+                <div class="col col-md-2"></div>
+                <div class="col-12 col-md-8">
+                    <h1>My Watchlist</h1>
+                    <div *ngFor="let stock of watchlist">
+                        <div class="card row mb-3" (click)="openDetails(stock.tickerSymbol)">
+                            <button type="button" class="btn-close" (click)="removeStock(stock.tickerSymbol); $event.stopPropagation()"></button>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <h5 class="card-title">{{stock.tickerSymbol}}</h5>
+                                        <p class="card-text">{{stock.companyName}}</p>
+                                    </div>
+                                    <div class="col-6">
+                                        <div [class]="getColor(stock.quote.d)">
+                                            {{stock.quote.c}}
+                                            <br>
+                                            <div class="d-flex fs-5 align-items-center mb-2">
+                                                <i [class]="getArrow(stock.quote.d)" style="font-size: 15px;"></i>
+                                                <small class="d-flex">
+                                                    <span class="me-2">{{stock.quote.d}}</span> <span>({{stock.quote.dp}}%)</span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col col-md-2"></div>
+            </div>
+        </div>
+    </div>
+    
+</div>

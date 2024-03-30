@@ -36,12 +36,6 @@
         <div class="col col-md-3"></div>
     </div>
 </div>
-<div *ngIf="isEmpty(searchResults.companyDetails) && errorMessage">
-    <ngb-alert class="d-flex justify-content-center mx-5" type="danger" (closed)="close()">
-        <div>
-            {{ errorMessage }}
-        </div>
-    </ngb-alert>
-</div>
+
 <app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults"></app-company-details>
 

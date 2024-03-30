@@ -2,17 +2,18 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const app = express();
-app.use(cors({ origin: 'http://localhost:4200' }));
+app.use(cors({ origin: 'http://localhost:4200', methods: 'GET,POST,DELETE,PUT' }));
 const port = 3000;
 const API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0';
 
-const { MongoClient } = require('mongodb');
-const uri = 'mongodb://localhost:27017';
-//'mongodb+srv://shalinshah1998:vKkqoTACCiUfLSUm@stockapplication.clfuiyi.mongodb.net/?retryWrites=true&w=majority&appName=stockApplication';
-const dbName = 'stockApplication';
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = 'mongodb+srv://shalinshah1998:vKkqoTACCiUfLSUm@stockapplication.clfuiyi.mongodb.net/?retryWrites=true&w=majority&appName=stockApplication';
 const client = new MongoClient(uri);
-client.connect();
+const dbName = 'stockApplication';
 const db = client.db(dbName);
+const watchlist = db.collection('watchlist');
+const portfolio = db.collection('portfolio');
+const wallet = db.collection('wallet');
 console.log('Connected to MongoDB');
 // Home Route
 // app.get('/', (req, res) => {
@@ -222,93 +223,136 @@ app.get('/hourlyCharts/:symbol', async (req, res) => {
 });
 
 // Watchlist Route
-app.get('/watchlist', async (req, res) => {
-  const userId = 'user_id'; // Replace with the actual user_id
+app.get('/watchlist', async (req, res) => { 
+  console.log('Watchlist');
 
-  // Get the watchlist collection
-  const watchlist = db.collection('watchlist');
-
-  // Find the document with the specified _id
-  watchlist.findOne({ _id: userId }, (err, doc) => {
-    if (err) {
-      console.error('Failed to retrieve watchlist. Error:', err);
-      res.status(500).send('Failed to retrieve watchlist');
-      return;
-    }
-    console.log('Retrieved watchlist:', doc);
-    res.status(200).json(doc);
-  });
+  try {
+    // Find the documents and convert them to an array
+    const docs = await watchlist.find({}).toArray();
+    const symbols = docs.map(doc => ({ symbols: doc.symbols, name: doc.name }));
+    console.log('Retrieved watchlist:', symbols);
+    res.status(200).json(symbols);
+  } catch (err) {
+    console.error('Failed to retrieve watchlist. Error:', err);
+    res.status(500).send('Failed to retrieve watchlist');
+  }
 });
 
 
-app.put('/search/add/:symbol', async (req, res) => {
-  // Get the symbol from the URL parameters
+app.post('/search/add/:symbol', async (req, res) => {
+  console.log('Requst: ', req.body);
   const symbol = req.params.symbol;
-  //console.log('Symbol: ', symbol);
-  const userId = 'user_id';
-
-  const update = { $push: { symbols: symbol } };
-
-  // Get the watchlist collection
-  const watchlist = db.collection('watchlist');
-
-  // Update the document with the specified user_id
-  watchlist.updateOne({ _id: userId }, update, (err, result) => {
-    if (err) {
-      console.error('Failed to add to watchlist. Error:', err);
-      res.status(500).send('Failed to add to watchlist');
-      return;
-    }
+  const name = req.body.name;
+  console.log('Add to Watchlist:', symbol);
+  const newDoc = { symbols: symbol, name: name} ;
+  try {
+    const result = await watchlist.insertOne(newDoc);
     console.log('Added to watchlist:', result);
     res.status(200).send('Added to watchlist');
-  });
+  } catch (err) {
+    console.error('Failed to add to watchlist. Error:', err);
+    res.status(500).send('Failed to add to watchlist');
+  }
 });
 
 app.delete('/search/delete/:symbol', async (req, res) => {
   // Get the symbol from the URL parameters
   const symbol = req.params.symbol;
+  console.log('Removing from Watchlist:', symbol);
 
-  // Specify the user_id
-  const userId = 'user_id'; // Replace with the actual user_id
-
-  // Use the $pull operator to remove the symbol from the symbols array
-  const update = { $pull: { symbols: symbol } };
-
-  // Get the watchlist collection
-  const watchlist = db.collection('watchlist');
-
-  // Update the document with the specified user_id
-  watchlist.updateOne({ _id: userId }, update, (err, result) => {
-    if (err) {
-      console.error('Failed to remove from watchlist. Error:', err);
-      res.status(500).send('Failed to remove from watchlist');
-      return;
-    }
+  try {
+    const result = await watchlist.deleteOne({ symbols: symbol });
     console.log('Removed from watchlist:', result);
     res.status(200).send('Removed from watchlist');
-  });
+  } catch (err) {
+    console.error('Failed to remove from watchlist. Error:', err);
+    res.status(500).send('Failed to remove from watchlist');
+  }
 });
 
-// // Portfolio Route
-// app.get('/portfolio', (req, res) => {
-//   // Placeholder for portfolio implementation
-//   res.send('Portfolio Route');
-// });
+app.get('/wallet', async (req, res) => {
+  console.log('Wallet');
 
-// async function getStocks() {
-//   try {
-//     await client.connect();
-//     const db = client.db(dbName);
-//     console.log('Connected to MongoDB');
-//     const tradingStocks = db.collection('tradingStocks');
-//     const stocks = await tradingStocks.find({}).toArray();
-//     console.log('Stocks: ', stocks[0].wallet);
-//     return stocks;
-//   } finally {
-//     await client.close();
-//   }
-// }
-// getStocks().catch(console.dir);
+  try {
+    // Find the documents and convert them to an array
+    const docs = await wallet.find({}).toArray();
+    console.log('Retrieved wallet:', docs);
+    const balance = docs[0].balance;
+    res.status(200).json(balance);
+  } catch (err) {
+    console.error('Failed to retrieve wallet. Error:', err);
+    res.status(500).send('Failed to retrieve wallet');
+  }
+});
+
+app.post('/wallet/update/', async (req, res) => {
+  const amount = req.body.balance;
+  console.log('Update Wallet:', amount);
+  try {
+    const result = await wallet.updateOne({}, { $set: { balance: amount } });
+    console.log('Updated wallet:', result);
+    res.status(200).send('Updated wallet');
+  } catch (err) {
+    console.error('Failed to add to wallet. Error:', err);
+    res.status(500).send('Failed to add to wallet');
+  }
+});
+
+// Watchlist Route
+app.get('/portfolio', async (req, res) => { 
+  console.log('Portfolio');
+
+  try {
+    // Find the documents and convert them to an array
+    const docs = await portfolio.find({}).toArray();
+    const symbols = docs.map(doc => ({ symbols: doc.symbols, name: doc.name, quantity: doc.quantity, totalCost: doc.totalCost}));
+    console.log('Retrieved portfolio:', symbols);
+    res.status(200).json(symbols);
+  } catch (err) {
+    console.error('Failed to retrieve portfolio. Error:', err);
+    res.status(500).send('Failed to retrieve portfolio');
+  }
+});
+
+app.post('/portfolio/add/:symbol', async (req, res) => {
+  console.log('Request: ', req.body);
+  const symbol = req.params.symbol;
+  const name = req.body.name;
+  const quantity = req.body.quantity;
+  const totalCost = req.body.totalCost;
+  console.log('Add to portfolio:', symbol);
+  const newDoc = { symbols: symbol, name: name, quantity: quantity, totalCost: totalCost} ;
+
+  try {
+    const result = await portfolio.findOneAndUpdate(
+      { symbols: symbol }, // filter
+      { $set: newDoc }, // update
+      { upsert: true, returnOriginal: false } // options
+    );
+
+    console.log('Added to portfolio:', result);
+    res.status(200).send('Added to portfolio');
+  } catch (err) {
+    console.error('Failed to add to portfolio. Error:', err);
+    res.status(500).send('Failed to add to portfolio');
+  }
+});
+
+app.delete('/portfolio/delete/:symbol', async (req, res) => {
+  // Get the symbol from the URL parameters
+  const symbol = req.params.symbol;
+  console.log('Removing from Portfolio:', symbol);
+
+  try {
+    const result = await portfolio.deleteOne({ symbols: symbol });
+    console.log('Removed from portfolio:', result);
+    res.status(200).send('Removed from portfolio');
+  } catch (err) {
+    console.error('Failed to remove from portfolio. Error:', err);
+    res.status(500).send('Failed to remove from portfolio');
+  }
+});
+
 
 // Start the server
 app.listen(port, () => {

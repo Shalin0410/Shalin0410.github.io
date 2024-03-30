@@ -56,6 +56,17 @@ export class SearchAndErrorComponent {
 
   ngOnInit() {
     this.errorMessage = '';
+    // Get the ticker symbol from the URL parameters
+    
+    // If the ticker symbol exists, execute a search for it
+    this.route.params.subscribe(params => {
+      const companyToken = params['symbol'];
+      if (companyToken) {
+        this.searchQuery = companyToken;
+        this.onSearch();
+      }
+    });
+    console.log('Route:', this.router.url);
     this.searchResultsService.stateValue.subscribe((state: any) => {
       console.log('Search and Error Component State:', state);
       if (state) {
@@ -73,7 +84,12 @@ export class SearchAndErrorComponent {
           companyPeers: {},
           companyEarnings: {},
           companyCharts: {},
-          companyHourlyCharts: {}
+          companyHourlyCharts: {},
+          companyWatchlist: [],
+          wallet: "",
+          isInWatchlist: false,
+          companyPortfolio: [],
+          isInPortfolio: false
         };
       }
     });
@@ -97,7 +113,13 @@ export class SearchAndErrorComponent {
         this.searchResults.companyEarnings = this.formatNumbersInObject(data[6]);
         this.searchResults.companyCharts = this.formatNumbersInObject(data[7]);
         this.searchResults.companyHourlyCharts = this.formatNumbersInObject(data[8]);
-        //this.searchResults.companyWatchlist = data[9];
+        this.searchResults.companyWatchlist = data[9];
+        this.searchResults.wallet = data[10];
+        this.searchResults.isInWatchlist = this.searchResults.companyWatchlist.some((company: any) => company.symbols === this.searchResults.companyDetails.ticker);
+        this.searchResults.companyPortfolio = data[11];
+        this.searchResults.isInPortfolio = this.searchResults.companyPortfolio.some((stock: any) => stock.symbols === this.searchResults.companyDetails.ticker && stock.quantity > 0);
+        console.log('Wallet: ', data[10]);
+        console.log('Wallet:', this.searchResults.wallet);
         if (Object.keys(this.searchResults.companyDetails).length === 0) {
           this.errorMessage = 'No data found. Please enter a valid ticker';
           console.log('Error Message: ', this.errorMessage);
@@ -127,7 +149,7 @@ export class SearchAndErrorComponent {
       this.errorMessage = 'Please enter a valid ticker';
     } else {
       console.log(this.searchQuery);
-      console.log('Routing to search page')
+      console.log('Routing to search page');
       this.onSearch();
       this.router.navigate(['/search', this.searchQuery]);
     }
@@ -137,15 +159,15 @@ export class SearchAndErrorComponent {
     // Implement the logic to fetch autocomplete suggestions based on the searchQuery
     // Make an HTTP call to the autocomplete API endpoint
     if (this.searchQuery && this.searchQuery.length > 0) {
-      console.log('Search Query:', this.searchQuery);
-      console.log('Fetching autocomplete suggestions');
+      //console.log('Search Query:', this.searchQuery);
+      //console.log('Fetching autocomplete suggestions');
       this.isLoading = true; // Add the 'isLoading' property to the class
-      console.log(this.isLoading);
+      //console.log(this.isLoading);
       this.searchBarService.searchCompanies(this.searchQuery).subscribe((data: any) => {
         this.autocompleteSuggestions = data.filter((suggestion: any) => (!suggestion.symbol.includes('.') && suggestion.type.includes('Common Stock')));
         //this.showAutocomplete = true;
         this.isLoading = false; // Set 'isLoading' to false after the data is fetched
-        console.log(this.isLoading);
+        //console.log(this.isLoading);
       });
     } else {
       this.autocompleteSuggestions = [];

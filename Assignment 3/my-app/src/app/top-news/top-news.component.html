@@ -2,7 +2,7 @@
     <div class="row">
         <div class="col-12 col-md-6 d-flex flex-column ">
             <div *ngFor="let news of searchResults.companyNews.slice(0, searchResults.companyNews.length / 2)">
-                <div class="card my-3">
+                <div class="card my-3" (click)="openNewsModal(newsModal, news)">
                     <div class="row g-0 col">
                       <div class="col-md-4 p-3">
                         <div class="img-container">
@@ -20,7 +20,7 @@
         </div>
         <div class="col-12 col-md-6 d-flex flex-column">
             <div *ngFor="let news of searchResults.companyNews.slice(searchResults.companyNews.length / 2)">
-                <div class="card my-3">
+                <div class="card my-3"  (click)="openNewsModal(newsModal, news)">
                     <div class="row g-0">
                       <div class="col-md-4 p-3">
                         <div class="img-container">
@@ -39,21 +39,27 @@
     </div>
 </div>
 
- <!-- Modal  -->
-<!-- <div class="modal fade" #newsModal tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">{{currentNews.headline}}</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          {{currentNews.summary}}
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <a [href]="currentNews.url" target="_blank">For more details click here</a>
-        </div>
-      </div>
+<ng-template #newsModal let-modal>
+  <div class="modal-header">
+    <div class="d-flex justify-content-end">
+      <h4 class="modal-title">{{selectedNews.source}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div> <br>
+    <div>
+      <small>{{convertDate(selectedNews.datetime)}}</small>
     </div>
-</div> -->
+  </div>
+  <div class="modal-body">
+    <h5>{{selectedNews.headline}}</h5>
+    <small>{{selectedNews.summary}}</small>
+    <small>For more details click <a href="{{selectedNews.url}}" target="_blank">here</a></small>
+  </div>
+  <div class="modal-footer border rounded">
+    <p class="fs-5">Share</p>
+
+    <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{selectedNews.headline}}&url={{selectedNews.url}}" target="_blank" data-size="large"></a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u={{selectedNews.url}}" target="_blank" class="btn btn-primary">Share on Facebook</a>
+  </div>
+</ng-template>

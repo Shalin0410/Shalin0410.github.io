@@ -89,7 +89,8 @@ export class SearchAndErrorComponent {
           wallet: "",
           isInWatchlist: false,
           companyPortfolio: [],
-          isInPortfolio: false
+          isInPortfolio: false,
+          isMarketOpen: false
         };
       }
     });

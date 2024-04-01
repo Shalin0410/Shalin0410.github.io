@@ -148,8 +148,7 @@ app.get('/charts/:symbol', async (req, res) => {
     // Make API call to get company chart using ticker
     let fromDate = new Date();
     let toDate = new Date();
-    fromDate.setMonth(toDate.getMonth() - 6);
-    fromDate.setDate(fromDate.getDate() - 1);
+    fromDate.setFullYear(fromDate.getFullYear() - 2);
 
     console.log('Date: ', fromDate, toDate);
     fromDate = fromDate.toISOString().split('T')[0];

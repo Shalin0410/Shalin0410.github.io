@@ -2,21 +2,11 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import * as Highcharts from 'highcharts';
-import indicators from 'highcharts/indicators/indicators';
-import volumeByPrice from 'highcharts/indicators/volume-by-price';
-import HighchartsExporting from 'highcharts/modules/exporting';
-import HighchartsStock from 'highcharts/modules/stock';
-import HC_stock from 'highcharts/modules/stock';
 import {  HighchartsChartModule } from 'highcharts-angular'; 
-HC_stock(Highcharts);
+import { Options } from 'highcharts';
+// import HC_stock from 'highcharts/modules/stock';
+// HC_stock(Highcharts);
 
-interface StockData {
-  t: number;
-  o: number;
-  h: number;
-  l: number;
-  pc: number;
-}
 
 @Component({
   selector: 'app-summary',
@@ -28,26 +18,52 @@ interface StockData {
 
 export class SummaryComponent implements OnInit {
   @Input() searchResults: any;
-  Highcharts: typeof Highcharts = Highcharts; // required
-  chartOptions: Highcharts.Options = {}; // initialize chartOptions
-
+  highcharts: any;  
+  chartOptions: any;
+  
+  
   ngOnInit() {
-    // this.chartOptions = {
-    //   series: [{
-    //     type: 'line',
-    //     data: this.searchResults.companyHourlyCharts.map((item: StockData) => [item.t * 1000, item.o, item.h, item.l, item.pc])
-    //   }],
-    //   title: {
-    //     text: 'Stock Price Variation'
-    //   },
-    //   xAxis: {
-    //     type: 'datetime'
-    //   },
-    //   yAxis: {
-    //     title: {
-    //       text: 'Price'
-    //     }
-    //   }
-    // };
+    console.log('Summary Component Initialized');
+    console.log(this.searchResults);
+    this.highcharts = Highcharts;  
+    this.chartOptions = {
+      chart: {
+        backgroundColor: 'rgba(211, 211, 211, 0.3)',
+      },
+      title: {
+        text: this.searchResults.companyDetails.ticker + ' Hourly Price Variation',
+        style: {
+          color: 'grey',
+        }
+      },
+      legend: {
+        enabled: false
+      },
+      xAxis: {
+        type: 'datetime',
+      },
+      yAxis: {
+        startOnTick: false,
+        endOnTick: false,
+        title: {
+          text: ''
+        },
+        opposite: true,
+      },
+      plotOptions: {
+        line: {
+            marker: {
+                enabled: false
+            },
+            zones: [{
+                color: this.searchResults.isMarketOpen ? 'green' : 'red'
+              }]
+        }
+      },
+      series: [{
+        data: this.searchResults.companyHourlyCharts.results.map((result: any) => [result.t, result.c]),
+        type: 'line'
+      }],
+    };
   }
 }

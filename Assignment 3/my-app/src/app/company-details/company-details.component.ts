@@ -92,11 +92,14 @@ export class CompanyDetailsComponent {
       if (difference > 300000) {
         this.market = 'Market is closed ' + this.convertDate(this.searchResults.companyQuote.t);
         this.isMarketOpen = false;
+        this.searchResults.isMarketOpen = false;
       } else {
         this.market = 'Market is open';
         this.isMarketOpen = true;
+        this.searchResults.isMarketOpen = true;
       }
       this.getMarketColor();
+      this.searchResultService.setResults(this.searchResults);
     }
   }
 

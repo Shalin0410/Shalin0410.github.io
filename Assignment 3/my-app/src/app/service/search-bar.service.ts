@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, catchError, from, of, forkJoin } from 'rxjs'; // Import the Observable class
 import { HttpClient } from '@angular/common/http'; // Import the HttpClient module
+import { throwError } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -85,7 +86,12 @@ export class SearchBarService {
   addToPortfolio(symbol: string, companyName: string, quantity: number, totalCost: string) {
     console.log('Service addToPortfolio: ', symbol);
     console.log('Final call to backend: ', `${this.apiUrl}/portfolio/add/${symbol}`);
-    this.http.post(`${this.apiUrl}/portfolio/add/${symbol}`, {symbols: symbol, name: companyName, quantity: quantity, totalCost: totalCost}).subscribe((data: any) => {
+    this.http.post(`${this.apiUrl}/portfolio/add/${symbol}`, {symbols: symbol, name: companyName, quantity: quantity, totalCost: totalCost}, {responseType: 'text'})
+    .pipe(catchError(error => {
+      console.error('Error in addToPortfolio:', error);
+      return throwError(error);
+    }))
+    .subscribe((data: any) => {
       console.log('Service addToPortfolio data: ', data);
     });
   }
@@ -105,9 +111,13 @@ export class SearchBarService {
   updateToWallet(amount: string) {
     console.log('Service updateToWallet: ', amount);
     console.log('Final call to backend: ', `${this.apiUrl}/wallet/update`);
-    this.http.post(`${this.apiUrl}/wallet/update`, {balance: amount}).subscribe((data: any) => {
+    this.http.post(`${this.apiUrl}/wallet/update`, {balance: amount}, {responseType: 'text'}).subscribe((data: any) => {
       console.log('Service updateToWallet data: ', data);
     });
+  }
+
+  getWalletBalance() {
+    return this.http.get(`${this.apiUrl}/wallet/`).pipe(catchError(error => of({})));
   }
 
 

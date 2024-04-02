@@ -16,6 +16,7 @@
                 <div class="col col-sm-2"></div>
                 <div class="col-12 col-sm-8">
                     <h3>My Portfolio</h3>
+                    <h5>Money in Wallet: ${{balance}}</h5>
                     <div *ngIf="portfolioStocks.length === 0">
                         <ngb-alert class="d-flex justify-content-center m-2 " [dismissible]="false" type="warning">
                             <div>
@@ -24,7 +25,6 @@
                         </ngb-alert>
                     </div>
                     <div *ngIf="portfolioStocks.length !== 0">
-                        <h5>Money in Wallet: ${{balance}}</h5>
                         <div *ngFor="let stock of portfolioStocks">
                             <div class="card row sm-3 mb-3" *ngIf="stock.quantity > 0">
                                 <h5 class="card-header" (click)="openDetails(stock.tickerSymbol)">

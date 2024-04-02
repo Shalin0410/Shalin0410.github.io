@@ -45,5 +45,9 @@
     </ngb-alert>
 </div>
 
+<div *ngIf="isLoadingSearch" class="align-self-center mt-3">
+    <mat-spinner></mat-spinner>
+</div>
+
 <app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults"></app-company-details>
 

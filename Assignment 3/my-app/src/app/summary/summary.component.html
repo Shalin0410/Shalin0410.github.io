@@ -11,11 +11,11 @@
           <p class="fs-5 text-center text-decoration-underline mb-3" style="font-weight: 500;">About the company</p>
           <small class="mb-2"><b>IPO Start Date:</b> {{ searchResults.companyDetails.ipo }}</small>
           <small class="mb-2"><b>Industry:</b> {{ searchResults.companyDetails.finnhubIndustry }}</small>
-          <small class="mb-2"><b>Webpage:</b> <a href="{{ searchResults.companyDetails.weburl }}"> {{ searchResults.companyDetails.weburl }}</a></small>
+          <small class="mb-2"><b>Webpage:</b> <a href="{{ searchResults.companyDetails.weburl }}" target="_blank"> {{ searchResults.companyDetails.weburl }}</a></small>
           <small class="mb-2"><b>Company Peers:</b> </small>
           <small> 
               <span *ngFor="let peer of searchResults.companyPeers">
-                <a [routerLink]="['/search', peer]">{{ peer }}, </a>
+                <a class="text-primary" (click)="getSymbol(peer)"><u>{{ peer }},</u></a>
               </span>
           </small>
         </div>

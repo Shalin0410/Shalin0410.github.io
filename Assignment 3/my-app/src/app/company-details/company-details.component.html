@@ -1,7 +1,3 @@
-<div *ngIf="isLoading" class="align-self-center mt-3">
-    <mat-spinner></mat-spinner>
-</div>
-
 <div *ngIf="!isLoading">
     <div *ngIf="purchaseMessage">
         <ngb-alert class="d-flex justify-content-center mx-2" type={{typeMsg}} (closed)="close()">

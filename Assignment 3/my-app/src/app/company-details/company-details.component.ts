@@ -46,6 +46,7 @@ export class CompanyDetailsComponent {
   constructor(private searchBarService: SearchBarService, private searchResultService: SearchResultsService) {}
 
   ngOnInit() {
+    this.isLoading = true;
     console.log('Company Details Component Initialized');
     this.checkMarketStatus();
     if (this.isMarketOpen) {
@@ -102,7 +103,7 @@ export class CompanyDetailsComponent {
         this.searchResults.isMarketOpen = true;
       }
       this.getMarketColor();
-      this.searchResultService.setResults(this.searchResults);
+      //this.searchResultService.setResults(this.searchResults);
     }
   }
 
@@ -133,7 +134,7 @@ export class CompanyDetailsComponent {
     this.searchResults.isInWatchlist = true;
     this.purchaseMessage = `${this.searchResults.companyDetails.ticker} added to Watchlist`;
     this.typeMsg = 'success';
-    this.searchResultService.setResults(this.searchResults);
+    //this.searchResultService.setResults(this.searchResults);
   }
 
   removeFromWatchlist() {
@@ -147,7 +148,7 @@ export class CompanyDetailsComponent {
     this.searchResults.isInWatchlist = false;
     this.purchaseMessage = `${this.searchResults.companyDetails.ticker} removed from Watchlist`;
     this.typeMsg = 'danger';
-    this.searchResultService.setResults(this.searchResults);
+    //this.searchResultService.setResults(this.searchResults);
   }
 
 	open(content: TemplateRef<any>) {
@@ -183,7 +184,7 @@ export class CompanyDetailsComponent {
     this.purchaseMessage = `${this.searchResults.companyDetails.ticker} bought successfully`;
     this.typeMsg = 'success';
     this.searchResults.isInPortfolio = true;
-    this.searchResultService.setResults(this.searchResults);
+    //this.searchResultService.setResults(this.searchResults);
     console.log(`Purchased ${quantity} stocks`);
 
     setTimeout(() => {
@@ -248,7 +249,7 @@ export class CompanyDetailsComponent {
     }
     this.purchaseMessage = `${this.searchResults.companyDetails.ticker} sold successfully`;
     this.typeMsg = 'danger';
-    this.searchResultService.setResults(this.searchResults);
+    //this.searchResultService.setResults(this.searchResults);
     console.log(`Sold ${quantity} stocks`);
 
     setTimeout(() => {

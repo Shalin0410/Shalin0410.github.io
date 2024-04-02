@@ -50,12 +50,14 @@ export class SearchAndErrorComponent {
     isInWatchlist: false,
     companyPortfolio: [],
     isInPortfolio: false,
-    isMarketOpen: false
+    isMarketOpen: false,
+    callApiOnce: false
   };
   showAutocomplete: boolean = false;
   errorMessage: string = '';
   typeMsg: string = '';
   isLoading: boolean = false;
+  isLoadingSearch: boolean = false;
 
   constructor(private searchBarService: SearchBarService, private router: Router, private route: ActivatedRoute, private searchResultsService: SearchResultsService) { 
   }
@@ -81,7 +83,9 @@ export class SearchAndErrorComponent {
       console.log('Search and Error Component State:', state);
       console.log('Search Results:', this.searchResults);
       if (state.companyCharts.ticker === state.companyDetails.ticker) {
+        this.searchQuery = state.companyDetails.ticker;
         this.searchResults = state;
+        this.router.navigate(['/search', this.searchQuery]);
       } else {
         this.searchQuery = state.companyDetails.ticker;
         console.log('Search Query:', this.searchQuery);
@@ -104,7 +108,8 @@ export class SearchAndErrorComponent {
   onSearch() {
     console.log('searchQuery:', this.searchQuery);
     console.log('onSearch');
-    if (this.errorMessage !== 'Please enter a valid ticker') {
+    if (this.errorMessage !== 'Please enter a valid ticker' && this.searchResults.callApiOnce === false) {
+      this.isLoadingSearch = true;
       this.searchBarService.getAllDetails(this.searchQuery).subscribe(data => {
         this.searchResults.companyDetails = this.formatNumbersInObject(data[0]);
         this.searchResults.companyQuote = this.formatNumbersInObject(data[1]);
@@ -122,6 +127,7 @@ export class SearchAndErrorComponent {
         this.searchResults.isInWatchlist = this.searchResults.companyWatchlist.some((company: any) => company.symbols === this.searchResults.companyDetails.ticker);
         this.searchResults.companyPortfolio = data[11];
         this.searchResults.isInPortfolio = this.searchResults.companyPortfolio.some((stock: any) => stock.symbols === this.searchResults.companyDetails.ticker && stock.quantity > 0);
+        this.searchResults.callApiOnce = true;
         console.log('Wallet: ', data[10]);
         console.log('Wallet:', this.searchResults.wallet);
         if (Object.keys(this.searchResults.companyDetails).length === 0) {
@@ -135,6 +141,7 @@ export class SearchAndErrorComponent {
         }
       });
     }
+    this.isLoadingSearch = false;
   }
 
   formatNumbersInObject(obj: any) {
@@ -201,10 +208,7 @@ export class SearchAndErrorComponent {
   console.log('Selected Suggestion:', suggestion);
   this.searchQuery = suggestion.symbol;
   this.showAutocomplete = false;
-  setTimeout(() => {
-    this.router.navigate(['/search', this.searchQuery], { queryParamsHandling: 'preserve' });
-    this.executeSearch();
-  }, 0);
+  this.executeSearch();
   }
 
   close() {

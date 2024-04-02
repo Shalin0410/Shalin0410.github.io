@@ -73,6 +73,7 @@ export class SummaryComponent implements OnInit {
   getSymbol(symbol: string) {
     console.log('Summary Symbol:', symbol);
     this.searchResults.companyDetails.ticker = symbol;
+    this.searchResults.callApiOnce = false;
     this.search.setResults(this.searchResults);
   }
 }

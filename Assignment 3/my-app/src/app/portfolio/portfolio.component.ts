@@ -64,6 +64,7 @@ export class PortfolioComponent {
     console.log('State:', state);
     state.companyDetails.ticker = symbol;
     console.log('State:', state);
+    state.callApiOnce = false;
     this.searchResultsService.setResults(state);
     // this.router.navigate(['/search', symbol]);
   }

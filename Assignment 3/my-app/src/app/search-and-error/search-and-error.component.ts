@@ -35,20 +35,26 @@ import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 export class SearchAndErrorComponent {
   searchQuery: string = '';
   autocompleteSuggestions: any[] = [];
-  // searchResults: any = {
-  //   companyDetails: {},
-  //   companyQuote: {},
-  //   companyNews: {},
-  //   companyRecommendations: {},
-  //   companySentiments: {},
-  //   companyPeers: {},
-  //   companyEarnings: {},
-  //   companyCharts: {},
-  //   companyHourlyCharts: {}
-  // };
-  searchResults: any;
+  searchResults: any = {
+    companyDetails: {},
+    companyQuote: {},
+    companyNews: {},
+    companyRecommendations: {},
+    companySentiments: {},
+    companyPeers: {},
+    companyEarnings: {},
+    companyCharts: {},
+    companyHourlyCharts: {},
+    companyWatchlist: [],
+    wallet: "",
+    isInWatchlist: false,
+    companyPortfolio: [],
+    isInPortfolio: false,
+    isMarketOpen: false
+  };
   showAutocomplete: boolean = false;
   errorMessage: string = '';
+  typeMsg: string = '';
   isLoading: boolean = false;
 
   constructor(private searchBarService: SearchBarService, private router: Router, private route: ActivatedRoute, private searchResultsService: SearchResultsService) { 
@@ -59,42 +65,39 @@ export class SearchAndErrorComponent {
     // Get the ticker symbol from the URL parameters
     
     // If the ticker symbol exists, execute a search for it
-    this.route.params.subscribe(params => {
-      const companyToken = params['symbol'];
-      if (companyToken) {
-        this.searchQuery = companyToken;
-        this.onSearch();
-      }
-    });
+    // this.route.params.subscribe(params => {
+    //   const companyToken = params['symbol'];
+    //   console.log('Company Token:', companyToken);
+
+    //   if (companyToken && companyToken !== this.searchQuery) {
+    //     console.log('Searching from another tab and not the same company');
+    //     this.searchQuery = companyToken;
+    //     this.onSearch();
+    //   }
+    // });
+    console.log('Search and Error Component Initialized Before');
     console.log('Route:', this.router.url);
     this.searchResultsService.stateValue.subscribe((state: any) => {
       console.log('Search and Error Component State:', state);
-      if (state) {
+      console.log('Search Results:', this.searchResults);
+      if (state.companyCharts.ticker === state.companyDetails.ticker) {
         this.searchResults = state;
-        this.searchQuery = state.companyDetails.ticker;
-        this.router.navigate(['/search', this.searchQuery]);
-        console.log('NgOnInit Search Query:', this.searchQuery);
       } else {
-        this.searchResults = {
-          companyDetails: {},
-          companyQuote: {},
-          companyNews: {},
-          companyRecommendations: {},
-          companySentiments: {},
-          companyPeers: {},
-          companyEarnings: {},
-          companyCharts: {},
-          companyHourlyCharts: {},
-          companyWatchlist: [],
-          wallet: "",
-          isInWatchlist: false,
-          companyPortfolio: [],
-          isInPortfolio: false,
-          isMarketOpen: false
-        };
+        this.searchQuery = state.companyDetails.ticker;
+        console.log('Search Query:', this.searchQuery);
+        this.executeSearch();
       }
     });
-    console.log('Search and Error Component Initialized');
+      // if (state) {
+      //   this.searchResults = state;
+      // } 
+      // if (this.searchQuery !== state.companyDetails.ticker) {
+      //   this.searchQuery = state.companyDetails.ticker;
+      //   console.log('Search Query:', this.searchQuery);
+      //   this.router.navigate(['/search', this.searchQuery]);
+      // }
+    // });
+    console.log('Search and Error Component Initialized After');
     //console.log('searchResults:', this.searchResults);
   }
 
@@ -123,7 +126,9 @@ export class SearchAndErrorComponent {
         console.log('Wallet:', this.searchResults.wallet);
         if (Object.keys(this.searchResults.companyDetails).length === 0) {
           this.errorMessage = 'No data found. Please enter a valid ticker';
+          this.typeMsg = 'danger';
           console.log('Error Message: ', this.errorMessage);
+          this.searchResultsService.setResults(this.searchResults);
         } else {
           this.errorMessage = '';
           this.searchResultsService.setResults(this.searchResults);
@@ -148,6 +153,8 @@ export class SearchAndErrorComponent {
     if (this.searchQuery.trim() === '') {
       console.log('Please enter a valid ticker');
       this.errorMessage = 'Please enter a valid ticker';
+      this.typeMsg = 'danger';
+
     } else {
       console.log(this.searchQuery);
       console.log('Routing to search page');

@@ -37,5 +37,13 @@
     </div>
 </div>
 
+<div *ngIf="errorMessage">
+    <ngb-alert class="d-flex justify-content-center mx-2" type={{typeMsg}} (closed)="close()">
+        <div>
+            {{ errorMessage }}
+        </div>
+    </ngb-alert>
+</div>
+
 <app-company-details *ngIf="!isEmpty(searchResults.companyDetails) && !errorMessage" [searchResults]="searchResults"></app-company-details>
 

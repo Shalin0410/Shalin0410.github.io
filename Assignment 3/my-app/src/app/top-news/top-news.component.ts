@@ -25,7 +25,7 @@ export class TopNewsComponent {
     console.log('Opening news modal');
     console.log(news);
     this.selectedNews = news;
-    this.modalService.open(newsModal, { size: 'lg' }).result.then((result) => {
+    this.modalService.open(newsModal, { size: '400px' }).result.then((result) => {
       console.log('Modal closed');
     }, (reason) => {
       console.log('Modal dismissed');

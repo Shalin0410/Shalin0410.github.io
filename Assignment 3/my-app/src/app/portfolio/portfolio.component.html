@@ -1,4 +1,4 @@
-<div *ngIf="isLoading">
+<div *ngIf="isLoading" class="d-flex justify-content-center mt-3">
     <mat-spinner></mat-spinner>
 </div>
   
@@ -26,8 +26,8 @@
                     <div *ngIf="portfolioStocks.length !== 0">
                         <h5>Money in Wallet: ${{balance}}</h5>
                         <div *ngFor="let stock of portfolioStocks">
-                            <div class="card row sm-3 mb-3" *ngIf="stock.quantity > 0" (click)="openDetails(stock.tickerSymbol)">
-                                <h5 class="card-header">
+                            <div class="card row sm-3 mb-3" *ngIf="stock.quantity > 0">
+                                <h5 class="card-header" (click)="openDetails(stock.tickerSymbol)">
                                     <span class="me-2">{{stock.tickerSymbol}}</span>
                                     <span><small class="text-muted">{{stock.companyName}}</small></span>
                                 </h5>
@@ -54,8 +54,15 @@
                                                     <h6 class="card-text">Current Price: </h6>
                                                     <h6 class="card-text">Market Value: </h6>
                                                 </div>
-                                                <div class="col-4"> 
-                                                    <h6 class="card-text">{{calcChange(stock.totalCost, stock.quantity, stock.quote.c)}}</h6>
+                                                <div [class] = "getColor(stock.totalCost, stock.quantity, stock.quote.c)"> 
+                                                    <h6 class="card-text">
+                                                        <div class="d-flex align-items-center mb-2">
+                                                            <i [class]="getArrow(stock.totalCost, stock.quantity, stock.quote.c)" style="font-size: 15px;"></i>
+                                                            <small class="d-flex">
+                                                                <span class="me-2">{{calcChange(stock.totalCost, stock.quantity, stock.quote.c)}}</span>
+                                                            </small>
+                                                        </div>
+                                                    </h6>
                                                     <h6 class="card-text">{{stock.quote.c}}</h6>
                                                     <h6 class="card-text">{{calcMarketVal(stock.quote.c, stock.quantity)}}</h6>
                                                 </div>

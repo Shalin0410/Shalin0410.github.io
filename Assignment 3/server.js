@@ -3,7 +3,8 @@ const axios = require('axios');
 const cors = require('cors');
 const app = express();
 app.use(cors({ origin: 'http://localhost:4200', methods: 'GET,POST,DELETE,PUT' }));
-const port = 3000;
+app.use(express.static('my-app/dist/my-app/browser'));
+const port = process.env.PORT || 8080;
 const API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0';
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
@@ -319,8 +320,9 @@ app.post('/portfolio/add/:symbol', async (req, res) => {
   const name = req.body.name;
   const quantity = req.body.quantity;
   const totalCost = req.body.totalCost;
+  const avgCost = totalCost / quantity;
   console.log('Add to portfolio:', symbol);
-  const newDoc = { symbols: symbol, name: name, quantity: quantity, totalCost: totalCost} ;
+  const newDoc = { symbols: symbol, name: name, quantity: quantity, totalCost: totalCost, avgCost: avgCost} ;
 
   try {
     const result = await portfolio.findOneAndUpdate(

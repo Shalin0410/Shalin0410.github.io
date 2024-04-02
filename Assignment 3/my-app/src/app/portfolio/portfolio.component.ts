@@ -36,7 +36,7 @@ export class PortfolioComponent {
       portfolio.forEach((stock: any) => {
         this.searchBarService.getCompanyQuote(stock.symbols).subscribe(companyQuote => {
           companyQuote = this.formatNumbersInObject(companyQuote);
-          this.portfolioStocks.push({ tickerSymbol: stock.symbols, companyName: stock.name, quantity: stock.quantity, totalCost: stock.totalCost, quote: companyQuote});
+          this.portfolioStocks.push({ tickerSymbol: stock.symbols, companyName: stock.name, quantity: stock.quantity, totalCost: stock.totalCost, avgCost: stock.avgCost, quote: companyQuote});
         });
       });
       this.searchBarService.getWalletBalance().subscribe((balance: any) => {
@@ -58,8 +58,14 @@ export class PortfolioComponent {
     return obj;
   }
 
-  openDetails(ticker: string) {
-    console.log('Opening details for:', ticker);
+  openDetails(symbol: string) {
+    console.log('Portfolio Opening details for:', symbol);
+    let state = this.searchResultsService.getResults();
+    console.log('State:', state);
+    state.companyDetails.ticker = symbol;
+    console.log('State:', state);
+    this.searchResultsService.setResults(state);
+    // this.router.navigate(['/search', symbol]);
   }
 
   costPerShare(totalCost: any, quantity: any){
@@ -156,7 +162,7 @@ export class PortfolioComponent {
     console.log('Quantity:', quantity);
     console.log('Total Sale:', this.totalSale(stock));
     
-    stockInPortfolio = this.updateSellPortfolio(stock, quantity, this.totalSale(stock));
+    stockInPortfolio = this.updateSellPortfolio(stock, quantity);
     console.log('Selling Stock in Portfolio:', stockInPortfolio);
     this.searchBarService.addToPortfolio(stockInPortfolio.tickerSymbol, stockInPortfolio.companyName, stockInPortfolio.quantity, stockInPortfolio.totalCost);
     this.balance = (parseFloat(this.balance) + parseFloat(this.totalSale(stock))).toFixed(2);
@@ -175,10 +181,10 @@ export class PortfolioComponent {
     }, 5000);
   }
 
-  updateSellPortfolio(stockInPortfolio:any, quantity: number, totalCost: string) {
-    stockInPortfolio.quantity -= quantity;
-    stockInPortfolio.totalCost = (parseFloat(stockInPortfolio.totalCost) - parseFloat(totalCost)).toFixed(2);
-    return stockInPortfolio;
+  updateSellPortfolio(stock:any, quantity: number) {
+    stock.quantity -= quantity;
+    stock.totalCost = (parseFloat(stock.totalCost) - ((parseFloat(stock.avgCost))*quantity)).toFixed(2);
+    return stock;
   }
 
   totalSale(stock: any) {
@@ -191,6 +197,28 @@ export class PortfolioComponent {
       return true;
     }
     return false;
+  }
+
+  getArrow(totalCost: any, quantity:any, currentPrice: any){
+    let change =  parseFloat(this.calcChange(totalCost, quantity, currentPrice));
+    if (change > 0) {
+      return 'bi bi-caret-up-fill me-1';
+    } else if (change < 0) {
+      return 'bi bi-caret-down-fill me-1';
+    } else {
+      return '';
+    }
+  }
+
+  getColor(totalCost: any, quantity:any, currentPrice: any) {
+    let change =  parseFloat(this.calcChange(totalCost, quantity, currentPrice));
+    if (change > 0) {
+      return 'col-4 text-success';
+    } else if (change < 0) {
+      return 'col-4 text-danger';
+    } else {
+      return 'col-4 text-dark';
+    }
   }
 
   close() {

@@ -7,7 +7,7 @@ import { throwError } from 'rxjs';
   providedIn: 'root'
 })
 export class SearchBarService {
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://assign2shalin.wl.r.appspot.com';
   public currentSearchQuery: string = 'home';
   private searchResults: any;
 

@@ -22,6 +22,7 @@ export class WatchlistComponent {
 
   ngOnInit() {
     console.log('Watchlist Component Initialized');
+    console.log('Route:', this.router.url);
     this.searchBarService.getWatchlist().subscribe((watchlist: any) => {
       console.log('Received watchlist');
       console.log('Watchlist:', watchlist);
@@ -76,7 +77,12 @@ export class WatchlistComponent {
 
   openDetails(symbol: string) {
     console.log('Opening details for:', symbol);
-    this.router.navigate(['/search', symbol]);
+    let state = this.searchResultsService.getResults();
+    console.log('State:', state);
+    state.companyDetails.ticker = symbol;
+    console.log('State:', state);
+    this.searchResultsService.setResults(state);
+    // this.router.navigate(['/search', symbol]);
   }
 
 }

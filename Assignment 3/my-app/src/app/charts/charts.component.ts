@@ -34,8 +34,8 @@ export class ChartsComponent implements OnInit{
     console.log(this.data[0]);
     this.dataLength = this.searchResults.companyCharts.results.length;
     this.groupingUnits = [[
-      'week',                         // unit name
-      [1]                             // allowed multiples
+      'week',                        
+      [1]                            
     ], [
       'month',
       [1, 2, 3, 4, 6]
@@ -93,6 +93,10 @@ export class ChartsComponent implements OnInit{
       subtitle: {
           text: '<p>With SMA and Volume by Price technical indicators<p>',
           useHTML: true
+      },
+
+      legend: {
+          enabled: false
       },
 
       xAxis: {

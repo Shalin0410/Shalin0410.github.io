@@ -1,7 +1,6 @@
 import { Component, Input, inject, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NgbAlertModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { SearchAndErrorComponent } from '../search-and-error/search-and-error.component';
 import { MatTabsModule } from '@angular/material/tabs';
 import { SearchBarService } from '../service/search-bar.service';
 import { SummaryComponent } from '../summary/summary.component';
@@ -12,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { interval } from 'rxjs';
 import { FormsModule } from '@angular/forms';
 import { SearchResultsService } from '../service/search-result.service';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 @Component({
   selector: 'app-company-details',
   standalone: true,
@@ -23,12 +23,14 @@ import { SearchResultsService } from '../service/search-result.service';
     TopNewsComponent, 
     ChartsComponent, 
     InsightsComponent,
-    FormsModule],
+    FormsModule,
+    MatProgressSpinnerModule],
   providers: [SearchBarService],
   templateUrl: './company-details.component.html',
   styleUrl: './company-details.component.css'
 })
 export class CompanyDetailsComponent {
+  isLoading: boolean = true;
   @Input() searchResults: any;
   market: string = '';
   isMarketOpen: boolean = false;
@@ -39,7 +41,6 @@ export class CompanyDetailsComponent {
 	closeResult = '';
   quantity: number = 0;
   purchaseMessage: string = '';
-  isLoading: boolean = true;
   typeMsg: string = '';
 
   constructor(private searchBarService: SearchBarService, private searchResultService: SearchResultsService) {}
@@ -56,7 +57,7 @@ export class CompanyDetailsComponent {
     }
     console.log('Company Details searchResults:', this.searchResults);
     this.isLoading = false;
-    this.subscription = interval(1500000).subscribe(() => {
+    this.subscription = interval(15000).subscribe(() => {
       console.log('Checking market status');
       console.log('searchQuery:', this.searchResults);
       if (this.isMarketOpen) {
@@ -68,12 +69,14 @@ export class CompanyDetailsComponent {
       }
       this.checkMarketStatus();
     });
+    this.isLoading = false;
   }
 
   ngOnDestroy() {
-    if (this.intervalId) {
-      clearInterval(this.intervalId);
-    }
+    // if (this.intervalId) {
+    //   clearInterval(this.intervalId);
+    // }
+    this.subscription.unsubscribe();
   }
 
   formatNumbersInObject(obj: any) {

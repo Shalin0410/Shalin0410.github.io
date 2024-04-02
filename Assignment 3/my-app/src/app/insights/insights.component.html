@@ -35,11 +35,19 @@
         <div class="col-12 col-md-3"></div>
     </div>
     <div class="row">
-        <div class="col-12 col-md-6">
-            Recommendation Trends
+        <div *ngIf="chartOptionsRec" class="col-12 col-md-6">
+            <highcharts-chart 
+            [Highcharts]="highchartsRec"
+            [options]="chartOptionsRec"
+            style="width: 100%; height: 100%; display: block;">
+            </highcharts-chart>
         </div>
-        <div class="col-12 col-md-6">
-            Historical EPS Surprises
+        <div *ngIf="chartOptionsHist" class="col-12 col-md-6">
+            <highcharts-chart 
+            [Highcharts]="highchartsHist"
+            [options]="chartOptionsHist"
+            style="width: 100%; height: 100%; display: block;">
+            </highcharts-chart>
         </div>
     </div>
 

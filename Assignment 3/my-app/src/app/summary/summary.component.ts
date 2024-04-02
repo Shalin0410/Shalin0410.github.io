@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import * as Highcharts from 'highcharts';
 import {  HighchartsChartModule } from 'highcharts-angular'; 
 import { Options } from 'highcharts';
+import { SearchResultsService } from '../service/search-result.service';
 // import HC_stock from 'highcharts/modules/stock';
 // HC_stock(Highcharts);
 
@@ -20,6 +21,8 @@ export class SummaryComponent implements OnInit {
   @Input() searchResults: any;
   highcharts: any;  
   chartOptions: any;
+
+  constructor(private search: SearchResultsService) {};
   
   
   ngOnInit() {
@@ -66,4 +69,11 @@ export class SummaryComponent implements OnInit {
       }],
     };
   }
+
+  getSymbol(symbol: string) {
+    console.log('Summary Symbol:', symbol);
+    this.searchResults.companyDetails.ticker = symbol;
+    this.search.setResults(this.searchResults);
+  }
 }
+

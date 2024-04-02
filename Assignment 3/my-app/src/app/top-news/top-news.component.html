@@ -40,26 +40,28 @@
 </div>
 
 <ng-template #newsModal let-modal>
-  <div class="modal-header">
-    <div class="d-flex justify-content-end">
-      <h4 class="modal-title">{{selectedNews.source}}</h4>
-      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
-        <span aria-hidden="true">&times;</span>
-      </button>
-    </div> <br>
-    <div>
-      <small>{{convertDate(selectedNews.datetime)}}</small>
-    </div>
+  <div class="modal-header justify-content-between">
+      <h4 class="align-self-end" id="modal-basic-title">
+        {{selectedNews.source}} <br>
+        <small class="fs-6 text-muted">{{convertDate(selectedNews.datetime)}}</small>
+      </h4>
+      <a class="ml-auto" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        &times;
+      </a>
   </div>
   <div class="modal-body">
     <h5>{{selectedNews.headline}}</h5>
-    <small>{{selectedNews.summary}}</small>
-    <small>For more details click <a href="{{selectedNews.url}}" target="_blank">here</a></small>
+    <small>{{selectedNews.summary}}</small> <br>
+    <small class="text-muted">For more details click <a href="{{selectedNews.url}}" target="_blank">here</a></small>
   </div>
-  <div class="modal-footer border rounded">
-    <p class="fs-5">Share</p>
-
-    <a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{selectedNews.headline}}&url={{selectedNews.url}}" target="_blank" data-size="large"></a>
-    <a href="https://www.facebook.com/sharer/sharer.php?u={{selectedNews.url}}" target="_blank" class="btn btn-primary">Share on Facebook</a>
+  <div class="m-2 modal-footer border rounded justify-content-start">
+    <h2 class="text-muted"><small class="fs-6">Share</small> <br>
+      <a href="https://twitter.com/intent/tweet?text={{selectedNews.headline}}&url={{selectedNews.url}}" target="_blank" data-size="large">
+        <i class="fa-brands fa-x-twitter me-2" style="color:black"></i>
+      </a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u={{selectedNews.url}}" target="_blank">
+        <i class="fa-brands fa-square-facebook"></i>
+      </a>
+    </h2>
   </div>
 </ng-template>

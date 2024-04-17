@@ -6,4 +6,7 @@
     </style>
 
     <style name="Theme.MyApplication" parent="Base.Theme.MyApplication" />
+    <style name="Theme.MyApplication.Launcher" parent="Theme.MyApplication">
+        <item name="android:windowBackground">@drawable/launcher</item>
+    </style>
 </resources>

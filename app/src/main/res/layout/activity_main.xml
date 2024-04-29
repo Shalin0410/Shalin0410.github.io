@@ -5,15 +5,136 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="@color/white">
 
-    <TextView
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:titleTextAppearance="@style/TextAppearance.Toolbar.Title" />
+
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!"
+        android:indeterminateTint="@color/purple"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/contentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <TextView
+            android:id="@+id/currentDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/currentDate"
+            android:textAppearance="@style/TextAppearance.CurrentDate"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/portfolioRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/netWorth" />
+
+        <TextView
+            android:id="@+id/portfolioSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:background="@color/lightgrey"
+            android:elevation="8dp"
+            android:paddingStart="16dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="5dp"
+            android:text="@string/portfolioSub"
+            android:textAppearance="@style/TextAppearance.Toolbar.Subtitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/currentDate" />
+
+        <TextView
+            android:id="@+id/netWorthSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="5dp"
+            android:text="@string/netWorthSub"
+            android:textAppearance="@style/TextAppearance.NetWorth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/portfolioSub" />
+
+        <TextView
+            android:id="@+id/cashBalSub"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/cashBalSub"
+            android:textAppearance="@style/TextAppearance.NetWorth"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/portfolioSub" />
+
+        <TextView
+            android:id="@+id/netWorth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:text="@string/netWorth"
+            android:textAppearance="@style/TextAppearance.NetWorth"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/netWorthSub" />
+
+        <TextView
+            android:id="@+id/cashBal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/cashBal"
+            android:textAppearance="@style/TextAppearance.NetWorth"
+            app:layout_constraintStart_toStartOf="@+id/cashBalSub"
+            app:layout_constraintTop_toBottomOf="@+id/cashBalSub" />
+
+        <TextView
+            android:id="@+id/favoriteSub"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/lightgrey"
+            android:elevation="8dp"
+            android:paddingStart="16dp"
+            android:paddingTop="5dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="5dp"
+            android:text="@string/favorites"
+            android:textAppearance="@style/TextAppearance.Toolbar.Subtitle"
+            app:layout_constraintStart_toStartOf="@+id/portfolioRecyclerView"
+            app:layout_constraintTop_toBottomOf="@+id/portfolioRecyclerView" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/favoritesRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/favoriteSub" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

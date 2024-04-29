@@ -6,4 +6,26 @@
     </style>
 
     <style name="Theme.StockApplication" parent="Base.Theme.StockApplication" />
+    <style name="TextAppearance.Toolbar.Title" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="TextAppearance.Toolbar.Subtitle" parent="TextAppearance.MaterialComponents.Subtitle2">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+    <style name="TextAppearance.CurrentDate" parent="TextAppearance.MaterialComponents.Headline6">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey</item>
+    </style>
+    <style name="TextAppearance.NetWorth" parent="TextAppearance.MaterialComponents.Subtitle1">"
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/grey</item>
+        <item name="android:textSize">18sp</item>
+    </style>
+    <style name="TextApperance.CardTitle" parent="TextAppearance.MaterialComponents.Subtitle1">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+
 </resources>

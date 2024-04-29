@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">Stock Application</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="currentDate">TextView</string>
+    <string name="portfolioSub">PORTFOLIO</string>
+    <string name="netWorthSub">Net Worth</string>
+    <string name="cashBalSub">Cash Balance</string>
+    <string name="netWorth">TextView</string>
+    <string name="cashBal">TextView</string>
+    <string name="favorites">FAVORITES</string>
 </resources>

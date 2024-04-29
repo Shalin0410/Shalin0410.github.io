@@ -1,0 +1,89 @@
+package io.github.stockapplication;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+
+public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
+    Context context;
+    ArrayList<Stock> portfolioList;
+
+    public StockAdapter(Context context, ArrayList<Stock> portfolioList) {
+        //Constructor
+        this.context = context;
+        this.portfolioList = portfolioList;
+    }
+
+    @NonNull
+    @Override
+    public StockAdapter.StockViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        //This is where you inflate the layout (Giving a look to our rows)
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.recycler_view_portfolio, parent, false);
+        return new StockAdapter.StockViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull StockAdapter.StockViewHolder holder, int position) {
+        //Assigning values to the views we created in the recycler_view_portfolio.xml
+        //based on the position of the recycler view
+        holder.symbol.setText(portfolioList.get(position).getSymbol());
+
+        double marketVal = portfolioList.get(position).getLatestQuote() * portfolioList.get(position).getQuantity();
+        holder.price.setText("$" + String.format("%.2f", marketVal));
+
+        double changeInPrice = (portfolioList.get(position).getLatestQuote() - portfolioList.get(position).getAvgCost()) * portfolioList.get(position).getQuantity();
+        double changeInPricePercent = (changeInPrice / (portfolioList.get(position).getAvgCost() * portfolioList.get(position).getQuantity())) * 100;
+
+        String changeInPriceAndPercent = String.format("%.2f", changeInPrice) + " (" + String.format("%.2f", changeInPricePercent) + "%)";
+        holder.changeInPrice.setText(changeInPriceAndPercent);
+
+        holder.quantity.setText(String.valueOf(portfolioList.get(position).getQuantity()) + " shares");
+
+        //Setting the image based on the change in price
+        if (changeInPricePercent > 0) {
+            holder.postiveOrNegative.setImageResource(R.drawable.trending_up);
+            holder.changeInPrice.setTextColor(Color.GREEN);
+        }
+        else {
+            holder.postiveOrNegative.setImageResource(R.drawable.trending_down);
+            holder.changeInPrice.setTextColor(Color.RED);
+        }
+
+    }
+
+    @Override
+    public int getItemCount() {
+        // the recycler view needs to know how many items it has
+        return portfolioList.size();
+    }
+
+    public static class StockViewHolder extends RecyclerView.ViewHolder {
+        //grabbing the views we created in the recycler_view_portfolio.xml
+        //Kinda like in the onCreate method
+        ImageView postiveOrNegative;
+        TextView symbol;
+        TextView price;
+        TextView changeInPrice;
+        TextView quantity;
+
+        public StockViewHolder(@NonNull View itemView) {
+            super(itemView);
+            //Assigning the views to the variables
+            postiveOrNegative = itemView.findViewById(R.id.postiveOrNegative);
+            symbol = itemView.findViewById(R.id.symbol);
+            price = itemView.findViewById(R.id.price);
+            changeInPrice = itemView.findViewById(R.id.changeInPrice);
+            quantity = itemView.findViewById(R.id.quantity);
+        }
+    }
+}

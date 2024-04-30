@@ -9,4 +9,7 @@
     <string name="netWorth">TextView</string>
     <string name="cashBal">TextView</string>
     <string name="favorites">FAVORITES</string>
+    <string name="searchIcon">searchIcon</string>
+    <string name="infavoritelist">inFavoriteList</string>
+    <string name="notinfavoritelist">notInFavoriteList</string>
 </resources>

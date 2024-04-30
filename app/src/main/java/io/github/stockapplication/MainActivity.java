@@ -1,18 +1,25 @@
 package io.github.stockapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -33,14 +40,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements RecyclerViewInterface {
+    //TODO: Add Search Suggestions
+    //TODO: Add moving item functionality
     
     private ConstraintLayout contentLayout;
     private ProgressBar spinner;
     private TextView cashBalance;
     private TextView netWorth;
     private RecyclerView portfolioRecyclerView;
+    private StockAdapter adapter;
     private RecyclerView favoritesRecyclerView;
+    private FavoriteStockAdapter favAdapter;
     private String apiURI = "https://assign2shalin.wl.r.appspot.com";
     private double calcNetWorth = 0;
 
@@ -51,6 +62,10 @@ public class MainActivity extends AppCompatActivity {
     ArrayList<Stock> favoriteStocks;
     int count = 0;
     int favCount = 0;
+    ActionBar actionBar;
+    MenuItem searchItem;
+    boolean firstTime = true;
+    ArrayList<String> suggestions;
 
 
     @Override
@@ -65,7 +80,9 @@ public class MainActivity extends AppCompatActivity {
         });
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Stocks");
+        actionBar = getSupportActionBar();
+        actionBar.setTitle("Stocks");
+
         RequestQueue requestQueue = Volley.newRequestQueue(this);
 
         spinner = (ProgressBar) findViewById(R.id.progressBar);
@@ -81,10 +98,10 @@ public class MainActivity extends AppCompatActivity {
         netWorth = (TextView) findViewById(R.id.netWorth);
         portfolioRecyclerView = (RecyclerView) findViewById(R.id.portfolioRecyclerView);
         favoritesRecyclerView = (RecyclerView) findViewById(R.id.favoritesRecyclerView);
-        portfolioStocks = new ArrayList<>();
-        favoriteStocks = new ArrayList<>();
-        count = 0;
-        favCount = 0;
+        Log.i("myTag", "onCreate");
+        if (firstTime) {
+            spinner.setVisibility(View.VISIBLE);
+        }
 
         fetchMongoDBData(requestQueue);
 
@@ -96,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void fetchMongoDBData(RequestQueue requestQueue) {
-        spinner.setVisibility(View.VISIBLE);
-
+        portfolioStocks = new ArrayList<>();
+        favoriteStocks = new ArrayList<>();
+        count = 0;
+        favCount = 0;
         getCashBalanceMongoDB(requestQueue);
         getPortfolioStocksMongoDB(requestQueue);
-
-        //favouritesRecyclerView.setAdapter(new StockAdapter(favouritesStocks));
     }
 
     private void getCashBalanceMongoDB(RequestQueue requestQueue) {
@@ -158,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                                                 throw new RuntimeException(e);
                                             }
                                             if (count == portfolioStocks.size()) {
-                                                StockAdapter adapter = new StockAdapter(MainActivity.this, portfolioStocks);
+                                                adapter = new StockAdapter(MainActivity.this, portfolioStocks,MainActivity.this, "portfolio");
                                                 portfolioRecyclerView.setAdapter(adapter);
                                                 portfolioRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                                                 String displayNetWorth = "$" + String.format("%.2f", calcNetWorth);
@@ -219,11 +236,18 @@ public class MainActivity extends AppCompatActivity {
                                                 throw new RuntimeException(e);
                                             }
                                             if (favCount == favoriteStocks.size()) {
-                                                FavoriteStockAdapter adapter = new FavoriteStockAdapter(MainActivity.this, favoriteStocks);
-                                                favoritesRecyclerView.setAdapter(adapter);
+                                                favAdapter = new FavoriteStockAdapter(MainActivity.this, favoriteStocks, MainActivity.this, "favorite");
+
+                                                ItemTouchHelper.Callback callback = new ItemMoveCallback(favAdapter);
+                                                ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+                                                touchHelper.attachToRecyclerView(favoritesRecyclerView);
+
+                                                favoritesRecyclerView.setAdapter(favAdapter);
                                                 favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                                                 spinner.setVisibility(View.GONE);
                                                 contentLayout.setVisibility(View.VISIBLE);
+                                                invalidateOptionsMenu();
+                                                enableSwipeToDelete(requestQueue);
                                             }
                                         }
                                     }, new Response.ErrorListener() {
@@ -242,5 +266,142 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         requestQueue.add(request);
+    }
+
+    private void enableSwipeToDelete(RequestQueue requestQueue) {
+        SwipeToDeleteCallback swipeToDeleteCallback = new SwipeToDeleteCallback(this) {
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                final int position = viewHolder.getAdapterPosition();
+                final Stock item = favAdapter.getData().get(position);
+                favAdapter.removeItem(position);
+                Log.i("myTag", "Item Deleted");
+                Log.i("myTag", "Symbol: " + item.getSymbol());
+                StringRequest stringRequest = new StringRequest(Request.Method.DELETE, apiURI + "/search/delete/" + item.getSymbol(),
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String response) {
+                                Log.i("myTag", "Response From Delete MongoDB: " + response);
+                            }
+                        }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("myTag", "Error: " + error.getMessage());
+                    }
+                });
+                requestQueue.add(stringRequest);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(swipeToDeleteCallback);
+        itemTouchHelper.attachToRecyclerView(favoritesRecyclerView);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu){
+        getMenuInflater().inflate(R.menu.action_buttons, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        if (spinner.getVisibility() == View.GONE) {
+            searchItem = menu.findItem(R.id.action_search_icon);
+            searchItem.setVisible(true);
+            SearchView searchView = (SearchView) searchItem.getActionView();
+            if (searchView != null) {
+                searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+                    @Override
+                    public boolean onQueryTextSubmit(String query) {
+                        Log.i("myTag", "Query: " + query);
+                        Intent intent = new Intent(MainActivity.this, StockDetailActivity.class);
+                        intent.putExtra("symbol", query);
+                        firstTime = false;
+                        startActivity(intent);
+                        return true;
+                    }
+
+                    @Override
+                    public boolean onQueryTextChange(String newText) {
+                        Log.i("myTag", "onQueryTextChange: " + newText);
+                        performSearch(newText, searchView);
+                        return true;
+                    }
+                });
+            }
+        }
+        return true;
+    }
+
+    private void performSearch(String query, SearchView searchView) {
+        suggestions = new ArrayList<>();
+        if (query == null || query.isEmpty()) {
+            return; // Return early if the query is empty
+        }
+        RequestQueue requestSuggestionQueue = Volley.newRequestQueue(this);
+        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, apiURI + "/search?q=" + query, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        Log.i("myTag", "Response From Search MongoDB: " + response);
+                        try {
+                            for (int i = 0; i < response.length(); i++) {
+                                JSONObject stock = response.getJSONObject(i);
+                                String symbol = stock.getString("symbol");
+                                String type = stock.getString("type");
+
+                                if (!symbol.contains(".") && "Common Stock".equals(type)) {
+                                    suggestions.add(symbol + " | " + stock.getString("description"));
+                                }
+                            }
+                            Log.i("myTag", "Suggestions: " + suggestions);
+                        } catch (JSONException e) {
+                            Log.i("myTag", "Error: " + e.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("myTag", "Volley error: " + error.getMessage());
+                }
+        });
+        requestSuggestionQueue.add(request);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.i("myTag", "onDestroy called");
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (!firstTime) {
+            Log.i("myTag", "onResume");
+            fetchMongoDBData(Volley.newRequestQueue(this));
+        }
+    }
+
+    @Override
+    public void onItemClicked(int position, String tag) {
+        Log.i("myTag", "Item Clicked");
+        Log.i("myTag", "Tag: " + tag + " Position: " + position);
+        Intent intent = new Intent(MainActivity.this, StockDetailActivity.class);
+        String symbol = "";
+        if (tag.equals("portfolio")) {
+            Stock stock = portfolioStocks.get(position);
+            symbol = stock.getSymbol();
+        } else {
+            Stock stock = favoriteStocks.get(position);
+            symbol = stock.getSymbol();
+        }
+        intent.putExtra("symbol", symbol);
+        firstTime = false;
+        startActivity(intent);
     }
 }

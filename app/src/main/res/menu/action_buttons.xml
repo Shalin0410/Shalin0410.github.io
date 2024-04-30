@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_not_favorite"
+        android:icon="@drawable/star_border"
+        android:title="@string/notinfavoritelist"
+        app:showAsAction="ifRoom"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/action_favorite"
+        android:icon="@drawable/full_star"
+        android:title="@string/infavoritelist"
+        app:showAsAction="ifRoom"
+        android:visible="false">
+    </item>
+    <item
+        android:id="@+id/action_search_icon"
+        android:icon="@drawable/search"
+        android:title="@string/searchIcon"
+        android:visible="false"
+        app:showAsAction="collapseActionView|ifRoom"
+        app:actionViewClass="androidx.appcompat.widget.SearchView">
+    </item>
+</menu>

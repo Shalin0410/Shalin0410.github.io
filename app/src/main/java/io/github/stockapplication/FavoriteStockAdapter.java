@@ -12,14 +12,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class FavoriteStockAdapter extends RecyclerView.Adapter<FavoriteStockAdapter.FavoriteStockViewHolder> {
+public class FavoriteStockAdapter extends RecyclerView.Adapter<FavoriteStockAdapter.FavoriteStockViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
+    private final RecyclerViewInterface recyclerViewInterface;
     Context context;
     ArrayList<Stock> favoriteList;
+    String tag;
 
-    public FavoriteStockAdapter(Context context, ArrayList<Stock> favoriteList) {
+    public FavoriteStockAdapter(Context context, ArrayList<Stock> favoriteList, RecyclerViewInterface recyclerViewInterface, String tag) {
         this.context = context;
         this.favoriteList = favoriteList;
+        this.recyclerViewInterface = recyclerViewInterface;
+        this.tag = tag;
+
     }
 
     @NonNull
@@ -27,7 +33,7 @@ public class FavoriteStockAdapter extends RecyclerView.Adapter<FavoriteStockAdap
     public FavoriteStockAdapter.FavoriteStockViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.recycler_view_favorite, parent, false);
-        return new FavoriteStockAdapter.FavoriteStockViewHolder(view);
+        return new FavoriteStockAdapter.FavoriteStockViewHolder(view, recyclerViewInterface, tag);
     }
 
     @Override
@@ -61,19 +67,65 @@ public class FavoriteStockAdapter extends RecyclerView.Adapter<FavoriteStockAdap
         return favoriteList.size();
     }
 
+    public void removeItem(int position) {
+        favoriteList.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public ArrayList<Stock> getData() {
+        return favoriteList;
+    }
+
+    @Override
+    public void onRowMoved(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(favoriteList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(favoriteList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onRowSelected(FavoriteStockViewHolder myViewHolder) {
+        myViewHolder.itemView.setBackgroundColor(Color.WHITE);
+    }
+
+    @Override
+    public void onRowClear(FavoriteStockViewHolder myViewHolder) {
+        myViewHolder.itemView.setBackgroundColor(Color.WHITE);
+    }
+
+
     public static class FavoriteStockViewHolder extends RecyclerView.ViewHolder {
         ImageView postiveOrNegative;
         TextView symbol;
         TextView price;
         TextView changeInPrice;
         TextView name;
-        public FavoriteStockViewHolder(@NonNull View itemView) {
+        public FavoriteStockViewHolder(@NonNull View itemView, RecyclerViewInterface recyclerViewInterface, String tag) {
             super(itemView);
             postiveOrNegative = itemView.findViewById(R.id.postiveOrNegative);
             symbol = itemView.findViewById(R.id.symbol);
             price = itemView.findViewById(R.id.price);
             changeInPrice = itemView.findViewById(R.id.changeInPrice);
             name = itemView.findViewById(R.id.name);
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (recyclerViewInterface != null) {
+                        int pos = getAdapterPosition();
+
+                        if (pos != RecyclerView.NO_POSITION) {
+                            recyclerViewInterface.onItemClicked(pos, tag);
+                        }
+                    }
+                }
+            });
         }
     }
 }

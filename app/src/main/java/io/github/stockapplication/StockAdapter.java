@@ -12,15 +12,20 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
-public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> {
+public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> implements ItemMoveCallback.ItemTouchHelperContract{
+    private final RecyclerViewInterface recyclerViewInterface;
     Context context;
     ArrayList<Stock> portfolioList;
+    String tag;
 
-    public StockAdapter(Context context, ArrayList<Stock> portfolioList) {
+    public StockAdapter(Context context, ArrayList<Stock> portfolioList, RecyclerViewInterface recyclerViewInterface, String tag) {
         //Constructor
         this.context = context;
         this.portfolioList = portfolioList;
+        this.recyclerViewInterface = recyclerViewInterface;
+        this.tag = tag;
     }
 
     @NonNull
@@ -29,7 +34,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHol
         //This is where you inflate the layout (Giving a look to our rows)
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.recycler_view_portfolio, parent, false);
-        return new StockAdapter.StockViewHolder(view);
+        return new StockAdapter.StockViewHolder(view, recyclerViewInterface, tag);
     }
 
     @Override
@@ -67,6 +72,31 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHol
         return portfolioList.size();
     }
 
+    @Override
+    public void onRowMoved(int fromPosition, int toPosition) {
+        if (fromPosition < toPosition) {
+            for (int i = fromPosition; i < toPosition; i++) {
+                Collections.swap(portfolioList, i, i + 1);
+            }
+        } else {
+            for (int i = fromPosition; i > toPosition; i--) {
+                Collections.swap(portfolioList, i, i - 1);
+            }
+        }
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onRowSelected(FavoriteStockAdapter.FavoriteStockViewHolder myViewHolder) {
+        myViewHolder.itemView.setBackgroundColor(Color.WHITE);
+    }
+
+    @Override
+    public void onRowClear(FavoriteStockAdapter.FavoriteStockViewHolder myViewHolder) {
+        myViewHolder.itemView.setBackgroundColor(Color.WHITE);
+    }
+
+
     public static class StockViewHolder extends RecyclerView.ViewHolder {
         //grabbing the views we created in the recycler_view_portfolio.xml
         //Kinda like in the onCreate method
@@ -76,7 +106,7 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHol
         TextView changeInPrice;
         TextView quantity;
 
-        public StockViewHolder(@NonNull View itemView) {
+        public StockViewHolder(@NonNull View itemView, RecyclerViewInterface recyclerViewInterface, String tag) {
             super(itemView);
             //Assigning the views to the variables
             postiveOrNegative = itemView.findViewById(R.id.postiveOrNegative);
@@ -84,6 +114,19 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHol
             price = itemView.findViewById(R.id.price);
             changeInPrice = itemView.findViewById(R.id.changeInPrice);
             quantity = itemView.findViewById(R.id.quantity);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                        if (recyclerViewInterface != null) {
+                            int pos = getAdapterPosition();
+
+                            if (pos != RecyclerView.NO_POSITION){
+                                recyclerViewInterface.onItemClicked(pos, tag);
+                            }
+                        }
+                }
+            });
         }
     }
 }

@@ -56,9 +56,12 @@ public class FavoriteStockAdapter extends RecyclerView.Adapter<FavoriteStockAdap
             holder.postiveOrNegative.setImageResource(R.drawable.trending_up);
             holder.changeInPrice.setTextColor(Color.GREEN);
         }
-        else {
+        else if (changeInPricePercent < 0) {
             holder.postiveOrNegative.setImageResource(R.drawable.trending_down);
             holder.changeInPrice.setTextColor(Color.RED);
+        } else {
+            holder.postiveOrNegative.setImageResource(android.R.color.transparent);
+            holder.changeInPrice.setTextColor(Color.BLACK);
         }
     }
 

@@ -47,8 +47,8 @@
                 android:id="@+id/companyProfileSD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/toolbar"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
                 <TextView
                     android:id="@+id/currentPriceSD"
@@ -120,8 +120,8 @@
                 android:id="@+id/tabChartsLayoutSD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/companyProfileSD"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/companyProfileSD">
 
                 <com.google.android.material.tabs.TabLayout
                     android:id="@+id/tabLayout"
@@ -161,8 +161,8 @@
                 android:id="@+id/portfolioSD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/tabChartsLayoutSD"
-                app:layout_constraintStart_toStartOf="parent">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tabChartsLayoutSD">
 
                 <TextView
                     android:id="@+id/portfolioTitleSD"
@@ -229,7 +229,7 @@
                     app:layout_constraintTop_toBottomOf="@+id/changeSD" />
 
                 <TextView
-                    android:id="@+id/textView"
+                    android:id="@+id/numSharesSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="32dp"
@@ -240,44 +240,44 @@
                     app:layout_constraintVertical_bias="0.0" />
 
                 <TextView
-                    android:id="@+id/textView2"
+                    android:id="@+id/numAvgCostPerShareSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TextView"
                     app:layout_constraintBottom_toBottomOf="@+id/avgCostPerShareSD"
-                    app:layout_constraintStart_toStartOf="@+id/textView"
+                    app:layout_constraintStart_toStartOf="@+id/numSharesSD"
                     app:layout_constraintTop_toTopOf="@+id/avgCostPerShareSD" />
 
                 <TextView
-                    android:id="@+id/textView3"
+                    android:id="@+id/numTotalCostSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TextView"
                     app:layout_constraintBottom_toBottomOf="@+id/totalCostSD"
-                    app:layout_constraintStart_toStartOf="@+id/textView2"
+                    app:layout_constraintStart_toStartOf="@+id/numAvgCostPerShareSD"
                     app:layout_constraintTop_toTopOf="@+id/totalCostSD" />
 
                 <TextView
-                    android:id="@+id/textView4"
+                    android:id="@+id/numChangeSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
                     android:text="TextView"
                     app:layout_constraintBottom_toBottomOf="@+id/changeSD"
-                    app:layout_constraintStart_toStartOf="@+id/textView3"
+                    app:layout_constraintStart_toStartOf="@+id/numTotalCostSD"
                     app:layout_constraintTop_toTopOf="@+id/changeSD" />
 
                 <TextView
-                    android:id="@+id/textView5"
+                    android:id="@+id/numMarketValSD"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="TextView"
                     app:layout_constraintBottom_toBottomOf="@+id/marketValueSD"
-                    app:layout_constraintStart_toStartOf="@+id/textView4"
+                    app:layout_constraintStart_toStartOf="@+id/numChangeSD"
                     app:layout_constraintTop_toTopOf="@+id/marketValueSD" />
 
                 <Button
-                    android:id="@+id/button"
+                    android:id="@+id/tradingBtnSD"
                     style="@style/GreenButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -293,6 +293,205 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.6" />
 
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/statsSD"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintTop_toBottomOf="@id/portfolioSD"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    android:id="@+id/statsTitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="30dp"
+                    android:text="Stats"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/openPriceSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="12dp"
+                    android:text="Open Price :"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/statsTitleSD"
+                    app:layout_constraintTop_toBottomOf="@+id/statsTitleSD" />
+                <TextView
+                    android:id="@+id/valOpenPriceSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="$100.00"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toEndOf="@+id/openPriceSD"
+                    app:layout_constraintTop_toTopOf="@+id/openPriceSD" />
+
+                <TextView
+                    android:id="@+id/lowPriceSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Low Price :"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/openPriceSD"
+                    app:layout_constraintTop_toBottomOf="@+id/openPriceSD" />
+                <TextView
+                    android:id="@+id/valLowPriceSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="$100.00"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/valOpenPriceSD"
+                    app:layout_constraintTop_toTopOf="@+id/lowPriceSD" />
+
+                <TextView
+                    android:id="@+id/highPriceSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="High Price :"
+                    app:layout_constraintEnd_toStartOf="@+id/valHighPriceSD"
+                    app:layout_constraintTop_toTopOf="@+id/valOpenPriceSD" />
+
+                <TextView
+                    android:id="@+id/valHighPriceSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="40dp"
+                    android:text="$100.00"
+                    app:layout_constraintBottom_toBottomOf="@+id/highPriceSD"
+                    app:layout_constraintEnd_toEndOf="parent"/>
+
+                <TextView
+                    android:id="@+id/prevCloseSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Prev. Close :"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/highPriceSD"
+                    app:layout_constraintTop_toBottomOf="@+id/highPriceSD" />
+
+                <TextView
+                    android:id="@+id/valPrevCloseSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="16dp"
+                    android:text="$100.00"
+                    app:layout_constraintTop_toTopOf="@+id/prevCloseSD"
+                    app:layout_constraintStart_toStartOf="@+id/valHighPriceSD" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/aboutSD"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/statsSD"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <TextView
+                    android:id="@+id/aboutTitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="30dp"
+                    android:text="About"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/IPOtitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="12dp"
+                    android:text="IPO Start Date"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/aboutTitleSD"
+                    app:layout_constraintTop_toBottomOf="@+id/aboutTitleSD" />
+
+                <TextView
+                    android:id="@+id/industryTitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Industry"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/IPOtitleSD"
+                    app:layout_constraintTop_toBottomOf="@+id/IPOtitleSD" />
+
+                <TextView
+                    android:id="@+id/webpageTitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Webpage"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/industryTitleSD"
+                    app:layout_constraintTop_toBottomOf="@+id/industryTitleSD" />
+
+                <TextView
+                    android:id="@+id/peersTitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Company Peers"
+                    android:textColor="@color/black"
+                    app:layout_constraintStart_toStartOf="@+id/webpageTitleSD"
+                    app:layout_constraintTop_toBottomOf="@+id/webpageTitleSD" />
+
+
+                <TextView
+                    android:id="@+id/valIPOSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="32dp"
+                    android:text="TextView"
+                    app:layout_constraintBottom_toBottomOf="@+id/IPOtitleSD"
+                    app:layout_constraintStart_toEndOf="@+id/IPOtitleSD"
+                    app:layout_constraintTop_toTopOf="@+id/IPOtitleSD"/>
+
+                <TextView
+                    android:id="@+id/valIndustrySD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TextView"
+                    app:layout_constraintBottom_toBottomOf="@+id/industryTitleSD"
+                    app:layout_constraintStart_toStartOf="@+id/valIPOSD"
+                    app:layout_constraintTop_toTopOf="@+id/industryTitleSD" />
+
+                <TextView
+                    android:id="@+id/valWebpageSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TextView"
+                    app:layout_constraintBottom_toBottomOf="@+id/webpageTitleSD"
+                    app:layout_constraintStart_toStartOf="@+id/valIndustrySD"
+                    app:layout_constraintTop_toTopOf="@+id/webpageTitleSD" />
+
+                <TextView
+                    android:id="@+id/valPeersSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:text="TextView"
+                    app:layout_constraintBottom_toBottomOf="@+id/peersTitleSD"
+                    app:layout_constraintStart_toStartOf="@+id/valWebpageSD"
+                    app:layout_constraintTop_toTopOf="@+id/peersTitleSD" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -1,11 +1,20 @@
 package io.github.stockapplication;
 
+import android.app.Dialog;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +49,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StockDetailActivity extends AppCompatActivity {
-    private MenuItem searchItem;
+    private Handler apiUpdateHandler = new Handler();
+    private Runnable apiUpdateRunnable;
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     ViewPagerAdapter viewPagerAdapter;
@@ -52,6 +62,11 @@ public class StockDetailActivity extends AppCompatActivity {
     int quantity;
     double totalCost;
     double avgCost;
+    private Button button;
+    private EditText numOfStocks;
+    private Button buyButton;
+    private Button sellButton;
+    int numOfSharesTraded;
     JSONObject companyProfile;
     JSONObject companyQuote;
     JSONArray companyNews;
@@ -120,48 +135,207 @@ public class StockDetailActivity extends AppCompatActivity {
                 tabLayout.getTabAt(position).select();
             }
         });
+        apiUpdateRunnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.i("StockDetailActivity", "Updating Company Profile");
+                fetchCompanyQuote();
+                apiUpdateHandler.postDelayed(this, 15000);
+            }
+        };
+        apiUpdateHandler.post(apiUpdateRunnable);
+
         fetchData();
+
+        //Stock Trading Code
+        button = findViewById(R.id.tradingBtnSD);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                numOfSharesTraded = 0;
+                final Dialog dialog = new Dialog(StockDetailActivity.this);
+                dialog.setContentView(R.layout.trading_dialogue);
+                TextView textView = (TextView) dialog.findViewById(R.id.tradingTitle);
+                String title = "Trade " + companyProfile.optString("name") + " shares";
+                textView.setText(title);
+                textView = (TextView) dialog.findViewById(R.id.resultTrade);
+                textView.setText("*$" + String.format("%.2f", companyQuote.optDouble("c")) + "/share = 0.00");
+                textView = (TextView) dialog.findViewById(R.id.walletRemaining);
+                textView.setText("$" + String.format("%.2f", walletBalance) + " to buy " + stockSymbol);
+                DisplayMetrics metrics = getResources().getDisplayMetrics();
+                int width = metrics.widthPixels;
+                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT);
+                dialog.show();
+                numOfStocks = (EditText) dialog.findViewById(R.id.editStockNum);
+                buyButton = dialog.findViewById(R.id.buyBtn);
+                sellButton = dialog.findViewById(R.id.sellBtn);
+                numOfStocks.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        try {
+                            TextView textView = dialog.findViewById(R.id.linkNumOfShares);
+                            TextView resultTextView = dialog.findViewById(R.id.resultTrade);
+                            Log.i("StockDetailActivity", "Number of Shares: " + s.toString());
+                            if (!s.toString().isEmpty()) {
+                                int numberOfShares = Integer.parseInt(s.toString());
+                                textView.setText(String.valueOf(numberOfShares));
+                                double pricePerShare = companyQuote.optDouble("c");
+                                double result = pricePerShare * numberOfShares;
+                                resultTextView.setText("*$" + String.format("%.2f", pricePerShare) + "/share = " + String.format("%.2f", result));
+                            } else {
+                                resultTextView.setText("*$" + String.format("%.2f", companyQuote.optDouble("c")) + "/share = 0.00");
+                            }
+                        } catch (NumberFormatException e) {
+                            Log.e("StockDetailActivity", "Error parsing number", e);
+                        }
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        numOfSharesTraded = Integer.parseInt(s.toString());
+                        Log.i("StockDetailActivity", "Number of Shares Planning To Trade: " + numOfSharesTraded);
+
+                    }
+                });
+                buyButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (numOfSharesTraded > 0 ) {
+                            if (numOfSharesTraded * companyQuote.optDouble("c") <= walletBalance) {
+                                walletBalance -= numOfSharesTraded * companyQuote.optDouble("c");
+                                quantity += numOfSharesTraded;
+                                totalCost += numOfSharesTraded * companyQuote.optDouble("c");
+                                avgCost = totalCost / quantity;
+                                Log.i("StockDetailActivity", "Buy Quantity: " + quantity);
+                                Log.i("StockDetailActivity", "Buy Total Cost: " + totalCost);
+                                Log.i("StockDetailActivity", "Buy Avg Cost: " + avgCost);
+                                updatePortfolio(walletBalance, quantity, totalCost);
+                                dialog.dismiss();
+
+                            } else {
+                                Toast.makeText(StockDetailActivity.this, "Not enough money to buy", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(StockDetailActivity.this, "Cannot buy non-positive shares", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+                sellButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if (numOfSharesTraded > 0) {
+                            if (quantity >= numOfSharesTraded) {
+                                walletBalance += numOfSharesTraded * companyQuote.optDouble("c");
+                                quantity -= numOfSharesTraded;
+                                totalCost -= numOfSharesTraded * avgCost;
+                                if (quantity <= 0){
+                                    avgCost = 0;
+                                } else {
+                                    avgCost = totalCost / quantity;
+                                }
+                                Log.i("StockDetailActivity", "Sell Quantity: " + quantity);
+                                Log.i("StockDetailActivity", "Sell Total Cost: " + totalCost);
+                                Log.i("StockDetailActivity", "Sell Avg Cost: " + avgCost);
+                                updatePortfolio(walletBalance, quantity, totalCost);
+                                dialog.dismiss();
+                            } else {
+                                Toast.makeText(StockDetailActivity.this, "Not enough shares to sell", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(StockDetailActivity.this, "Cannot sell non-positive shares", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }
+                });
+            }
+        });
     }
     private void setContents() {
-        setCompanyProfile();
-        setPortfolio();
+        //setCompanyProfile();
+        //setPortfolio();
+
         findViewById(R.id.contentSD).setVisibility(View.VISIBLE);
         findViewById(R.id.progressBarSD).setVisibility(View.GONE);
         invalidateOptionsMenu();
     }
     private void setCompanyProfile() {
-        ImageView imageView = findViewById(R.id.companyLogoSD);
-        String imageURL = companyProfile.optString("logo");
-        if (imageURL != null) {
-            Picasso.get().load(imageURL).into(imageView);
-        }
-        TextView textView = findViewById(R.id.symbolSD);
-        textView.setText(companyProfile.optString("ticker"));
+        if (companyProfile != null) {
+            ImageView imageView = findViewById(R.id.companyLogoSD);
+            String imageURL = companyProfile.optString("logo", "");
+            if (imageURL != null) {
+                Picasso.get().load(imageURL).into(imageView);
+            }
+            TextView textView = findViewById(R.id.symbolSD);
+            textView.setText(companyProfile.optString("ticker", ""));
 
-        textView = findViewById(R.id.companySD);
-        textView.setText(companyProfile.optString("name"));
-        textView = findViewById(R.id.currentPriceSD);
-        textView.setText("$" + String.format("%.2f", companyQuote.optDouble("c")));
-        textView = findViewById(R.id.changeInPriceSD);
-        double change = companyQuote.optDouble("d");
-        double changeInPercent = companyQuote.optDouble("dp");
-        if (change > 0) {
-            textView.setTextColor(Color.GREEN);
-            imageView = findViewById(R.id.trendingSD);
-            imageView.setImageResource(R.drawable.trending_up);
-        } else {
-            textView.setTextColor(Color.RED);
-            imageView = findViewById(R.id.trendingSD);
-            imageView.setImageResource(R.drawable.trending_down);
+            textView = findViewById(R.id.companySD);
+            textView.setText(companyProfile.optString("name", ""));
+            textView = findViewById(R.id.currentPriceSD);
+            textView.setText("$" + String.format("%.2f", companyQuote.optDouble("c")));
+            textView = findViewById(R.id.changeInPriceSD);
+            double change = companyQuote.optDouble("d");
+            double changeInPercent = companyQuote.optDouble("dp");
+            if (change > 0) {
+                textView.setTextColor(Color.GREEN);
+                imageView = findViewById(R.id.trendingSD);
+                imageView.setImageResource(R.drawable.trending_up);
+            } else {
+                textView.setTextColor(Color.RED);
+                imageView = findViewById(R.id.trendingSD);
+                imageView.setImageResource(R.drawable.trending_down);
+            }
+            textView.setText("$" + String.format("%.2f", change) + " (" + String.format("%.2f", changeInPercent) + "%)");
         }
-        textView.setText("$" + String.format("%.2f", change) + " (" + String.format("%.2f", changeInPercent) + "%)");
     }
     private void setPortfolio() {
         Log.i("StockDetailActivity", "Quantity: " + quantity);
         Log.i("StockDetailActivity", "Total Cost: " + totalCost);
         Log.i("StockDetailActivity", "Avg Cost: " + avgCost);
-//        TextView textView = findViewById(R.id.quantitySD);
-//        textView.setText(String.valueOf(quantity));
+        TextView textView = findViewById(R.id.numSharesSD);
+        textView.setText(String.valueOf(quantity));
+        textView = findViewById(R.id.numAvgCostPerShareSD);
+        textView.setText("$" + String.format("%.2f", avgCost));
+        textView = findViewById(R.id.numTotalCostSD);
+        textView.setText("$" + String.format("%.2f", totalCost));
+        textView = findViewById(R.id.numChangeSD);
+        double change = companyQuote.optDouble("c") - avgCost;
+        if (quantity > 0) {
+            if (change > 0) {
+                textView.setTextColor(Color.GREEN);
+                textView.setText("$" + String.format("%.2f", change));
+                textView = findViewById(R.id.numMarketValSD);
+                textView.setTextColor(Color.GREEN);
+                double marketVal = companyQuote.optDouble("c") * quantity;
+                textView.setText("$" + String.format("%.2f", marketVal));
+            } else if (change < 0) {
+                textView.setTextColor(Color.RED);
+                textView.setText("$" + String.format("%.2f", change));
+                textView = findViewById(R.id.numMarketValSD);
+                textView.setTextColor(Color.RED);
+                double marketVal = companyQuote.optDouble("c") * quantity;
+                textView.setText("$" + String.format("%.2f", marketVal));
+            } else {
+                textView.setTextColor(Color.BLACK);
+                textView.setText("$" + String.format("%.2f", change));
+                textView = findViewById(R.id.numMarketValSD);
+                textView.setTextColor(Color.BLACK);
+                double marketVal = companyQuote.optDouble("c") * quantity;
+                textView.setText("$" + String.format("%.2f", marketVal));
+            }
+        } else {
+            textView.setTextColor(Color.BLACK);
+            textView.setText("$" + String.format("%.2f", change));
+            textView = findViewById(R.id.numMarketValSD);
+            textView.setTextColor(Color.BLACK);
+            double marketVal = companyQuote.optDouble("c") * quantity;
+            textView.setText("$" + String.format("%.2f", marketVal));
+        }
     }
 
     @Override
@@ -221,6 +395,8 @@ public class StockDetailActivity extends AppCompatActivity {
 //        return true;
 //    }
 
+
+
     private void fetchData() {
         fetchCompanyProfile();
     }
@@ -232,7 +408,7 @@ public class StockDetailActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         Log.i("StockDetailActivity", "Response from company profile: " + response.toString());
                         companyProfile = response;
-                        fetchCompanyQuote();
+                        fetchCompanyNews();
                     }
                 },
                 new Response.ErrorListener() {
@@ -250,7 +426,8 @@ public class StockDetailActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         Log.i("StockDetailActivity", "Response from company quote: " + response.toString());
                         companyQuote = response;
-                        fetchCompanyNews();
+                        setCompanyProfile();
+                        setPortfolio();
                     }
                 },
                 new Response.ErrorListener() {
@@ -475,13 +652,13 @@ public class StockDetailActivity extends AppCompatActivity {
 
     private void updateFavorite(boolean doAdd) {
         if (doAdd) {
-            Map<String, String> params = new HashMap<>();
-            params.put("symbols", stockSymbol);
-            try {
-                params.put("name", companyProfile.getString("name"));
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
+//            Map<String, String> params = new HashMap<>();
+//            params.put("symbols", stockSymbol);
+//            try {
+//                params.put("name", companyProfile.getString("name"));
+//            } catch (JSONException e) {
+//                throw new RuntimeException(e);
+//            }
             StringRequest request = new StringRequest(Request.Method.POST, apiURI + "/search/add/" + stockSymbol,
                     new Response.Listener<String>() {
                         @Override
@@ -541,5 +718,121 @@ public class StockDetailActivity extends AppCompatActivity {
             Log.i("StockDetailActivity", "Request: " + request);
             requestQueue.add(request);
         }
+    }
+
+    private void updatePortfolio(double walletBalance, int quantity, double totalCost) {
+        this.walletBalance = walletBalance;
+        this.quantity = quantity;
+        this.totalCost = totalCost;
+        if (quantity > 0) {
+            StringRequest request = new StringRequest(Request.Method.POST, apiURI + "/portfolio/add/" + stockSymbol,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.i("StockDetailActivity", "Response from portfolio add: " + response);
+                            updateWallet(walletBalance);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.i("StockDetailActivity", "Update Portfolio Error: " + error.getMessage());
+                        }
+                    })
+            {
+                @Override
+                public byte[] getBody() {
+                    JSONObject jsonBody = new JSONObject();
+                    try {
+                        jsonBody.put("name", companyProfile.getString("name"));
+                        jsonBody.put("quantity", quantity);
+                        jsonBody.put("totalCost", totalCost);
+                    } catch (JSONException e) {
+                        Log.i("StockDetailActivity", "Error: " + e.getMessage());
+                    }
+                    return jsonBody.toString().getBytes(StandardCharsets.UTF_8);
+                }
+                @Override
+                public String getBodyContentType() {
+                    return "application/json; charset=utf-8";
+                }
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    return headers;
+                }
+            };
+            Log.i("StockDetailActivity", "Request: " + request.toString());
+            requestQueue.add(request);
+
+        }
+        else {
+            StringRequest request = new StringRequest(Request.Method.DELETE, apiURI + "/portfolio/delete/" + stockSymbol,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.i("StockDetailActivity", "Response from portfolio delete: " + response);
+                            updateWallet(walletBalance);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.i("StockDetailActivity", "Error: " + error.getMessage());
+                        }
+            });
+            Log.i("StockDetailActivity", "Request: " + request);
+            requestQueue.add(request);
+        }
+    }
+
+    private void updateWallet(double walletBalance) {
+        StringRequest request = new StringRequest(Request.Method.POST, apiURI + "/wallet/update",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.i("StockDetailActivity", "Response from wallet update: " + response);
+                        setPortfolio();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
+                    }
+        })
+        {
+            @Override
+            public byte[] getBody() {
+                JSONObject jsonBody = new JSONObject();
+                try {
+                    jsonBody.put("balance", walletBalance);
+                } catch (JSONException e) {
+                    Log.i("StockDetailActivity", "Error: " + e.getMessage());
+                }
+                return jsonBody.toString().getBytes(StandardCharsets.UTF_8);
+            }
+            @Override
+            public String getBodyContentType() {
+                return "application/json; charset=utf-8";
+            }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/json");
+                return headers;
+            }
+        };
+        Log.i("StockDetailActivity", "Request Update Wallet: " + request);
+        requestQueue.add(request);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        apiUpdateHandler.removeCallbacks(apiUpdateRunnable);
     }
 }

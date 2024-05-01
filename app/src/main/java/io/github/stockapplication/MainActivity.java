@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                 favAdapter.removeItem(position);
                 Log.i("myTag", "Item Deleted");
                 Log.i("myTag", "Symbol: " + item.getSymbol());
+                Log.i("myTag", "Favorite Stock: " + favoriteStocks);
                 StringRequest stringRequest = new StringRequest(Request.Method.DELETE, apiURI + "/search/delete/" + item.getSymbol(),
                         new Response.Listener<String>() {
                             @Override
@@ -316,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                         Log.i("myTag", "Query: " + query);
                         Intent intent = new Intent(MainActivity.this, StockDetailActivity.class);
                         intent.putExtra("symbol", query);
+                        intent.putExtra("favorites", favoriteStocks);
                         firstTime = false;
                         startActivity(intent);
                         return true;

@@ -1,12 +1,16 @@
 package io.github.stockapplication;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.SpannableString;
 import android.text.TextWatcher;
+import android.text.style.UnderlineSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +30,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.volley.AuthFailureError;
@@ -45,7 +50,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StockDetailActivity extends AppCompatActivity {
@@ -54,6 +61,9 @@ public class StockDetailActivity extends AppCompatActivity {
     TabLayout tabLayout;
     ViewPager2 viewPager2;
     ViewPagerAdapter viewPagerAdapter;
+    RecyclerView peers;
+    TextView webpage;
+    String webURL = "";
 
     ActionBar actionBar;
     String stockSymbol;
@@ -66,6 +76,7 @@ public class StockDetailActivity extends AppCompatActivity {
     private EditText numOfStocks;
     private Button buyButton;
     private Button sellButton;
+    private Button doneButton;
     int numOfSharesTraded;
     JSONObject companyProfile;
     JSONObject companyQuote;
@@ -182,7 +193,7 @@ public class StockDetailActivity extends AppCompatActivity {
                             TextView textView = dialog.findViewById(R.id.linkNumOfShares);
                             TextView resultTextView = dialog.findViewById(R.id.resultTrade);
                             Log.i("StockDetailActivity", "Number of Shares: " + s.toString());
-                            if (!s.toString().isEmpty()) {
+                            if (!s.toString().isEmpty() && Integer.parseInt(s.toString()) > 0) {
                                 int numberOfShares = Integer.parseInt(s.toString());
                                 textView.setText(String.valueOf(numberOfShares));
                                 double pricePerShare = companyQuote.optDouble("c");
@@ -217,6 +228,23 @@ public class StockDetailActivity extends AppCompatActivity {
                                 Log.i("StockDetailActivity", "Buy Avg Cost: " + avgCost);
                                 updatePortfolio(walletBalance, quantity, totalCost);
                                 dialog.dismiss();
+                                final Dialog dialog = new Dialog(StockDetailActivity.this);
+                                dialog.setContentView(R.layout.congrats_dialogue);
+                                TextView textView = (TextView) dialog.findViewById(R.id.messageTrade);
+                                String title = "You have successfully bought " + numOfSharesTraded + " shares of " + stockSymbol;
+                                textView.setText(title);
+                                doneButton = dialog.findViewById(R.id.doneBtn);
+                                DisplayMetrics metrics = getResources().getDisplayMetrics();
+                                int width = metrics.widthPixels;
+                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT);
+                                dialog.show();
+                                doneButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                    }
+                                });
 
                             } else {
                                 Toast.makeText(StockDetailActivity.this, "Not enough money to buy", Toast.LENGTH_SHORT).show();
@@ -244,21 +272,52 @@ public class StockDetailActivity extends AppCompatActivity {
                                 Log.i("StockDetailActivity", "Sell Avg Cost: " + avgCost);
                                 updatePortfolio(walletBalance, quantity, totalCost);
                                 dialog.dismiss();
+                                final Dialog dialog = new Dialog(StockDetailActivity.this);
+                                dialog.setContentView(R.layout.congrats_dialogue);
+                                TextView textView = (TextView) dialog.findViewById(R.id.messageTrade);
+                                String title = "You have successfully sold " + numOfSharesTraded + " shares of " + stockSymbol;
+                                textView.setText(title);
+                                doneButton = dialog.findViewById(R.id.doneBtn);
+                                DisplayMetrics metrics = getResources().getDisplayMetrics();
+                                int width = metrics.widthPixels;
+                                dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                                dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT);
+                                dialog.show();
+                                doneButton.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
                             } else {
                                 Toast.makeText(StockDetailActivity.this, "Not enough shares to sell", Toast.LENGTH_SHORT).show();
                             }
                         } else {
                             Toast.makeText(StockDetailActivity.this, "Cannot sell non-positive shares", Toast.LENGTH_SHORT).show();
                         }
-
                     }
                 });
             }
         });
+
+        webpage = findViewById(R.id.valWebpageSD);
+        webpage.setOnClickListener(new View.OnClickListener() {
+            @Override
+                    public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(webURL));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
     }
     private void setContents() {
-        //setCompanyProfile();
-        //setPortfolio();
+        setCompanyProfile();
+        setPortfolio();
+        setStats();
+        setAbout();
+        setInsights();
 
         findViewById(R.id.contentSD).setVisibility(View.VISIBLE);
         findViewById(R.id.progressBarSD).setVisibility(View.GONE);
@@ -337,6 +396,87 @@ public class StockDetailActivity extends AppCompatActivity {
             textView.setText("$" + String.format("%.2f", marketVal));
         }
     }
+    private void setStats() {
+        TextView textView = findViewById(R.id.valOpenPriceSD);
+        textView.setText("$" + String.format("%.2f", companyQuote.optDouble("o")));
+        textView = findViewById(R.id.valHighPriceSD);
+        textView.setText("$" + String.format("%.2f", companyQuote.optDouble("h")));
+        textView = findViewById(R.id.valLowPriceSD);
+        textView.setText("$" + String.format("%.2f", companyQuote.optDouble("l")));
+        textView = findViewById(R.id.valPrevCloseSD);
+        textView.setText("$" + String.format("%.2f", companyQuote.optDouble("pc")));
+    }
+    private void setAbout() {
+        TextView textView = findViewById(R.id.valIPOSD);
+        textView.setText(companyProfile.optString("ipo", ""));
+        Log.i("StockDetailActivity", "IPO Date: " + companyProfile.optString("ipo", ""));
+        textView = findViewById(R.id.valIndustrySD);
+        textView.setText(companyProfile.optString("finnhubIndustry", ""));
+        Log.i("StockDetailActivity", "Industry: " + companyProfile.optString("finnhubIndustry", ""));
+        webURL = companyProfile.optString("weburl", "");
+        SpannableString content = new SpannableString(webURL);
+        content.setSpan(new UnderlineSpan(), 0, webURL.length(), 0);
+        webpage.setText(content);
+        Log.i("StockDetailActivity", "Webpage: " + companyProfile.optString("weburl", ""));
+        peers = (RecyclerView) findViewById(R.id.valPeersSD);
+        List<String> list = new ArrayList<>();
+        try {
+
+            for (int i = 0; i < companyPeers.length(); i++) {
+                if (i != companyPeers.length() - 1){
+                    list.add(companyPeers.getString(i) + ", ");
+                }
+                else {
+                    list.add(companyPeers.getString(i));
+                }
+            }
+        } catch (JSONException e) {
+            Log.i("StockDetailActivity", "Issue In Printing Peers Error: " + e.getMessage());
+        }
+        Log.i("StockDetailActivity", "Peers: " + list);
+    }
+
+    private void setInsights() {
+        double totMSPR = 0.0;
+        double posMSPR = 0.0;
+        double negMSPR = 0.0;
+        int totChange = 0;
+        int posChange = 0;
+        int negChange = 0;
+        TextView textView = findViewById(R.id.tableCompanyNameSD);
+        textView.setText(companyProfile.optString("name", ""));
+        JSONArray data = companySentiment.optJSONArray("data");
+        for (int i = 0; i < data.length(); i++) {
+            JSONObject obj = data.optJSONObject(i);
+            if (obj.optInt("change") > 0) {
+                totChange = totChange + obj.optInt("change");
+                posChange = posChange + obj.optInt("change");
+            } else {
+                totChange = totChange + obj.optInt("change");
+                negChange = negChange + obj.optInt("change");
+            }
+            if (obj.optDouble("mspr") > 0) {
+                totMSPR = totMSPR + obj.optDouble("mspr");
+                posMSPR = posMSPR + obj.optDouble("mspr");
+            } else {
+                totMSPR = totMSPR + obj.optDouble("mspr");
+                negMSPR = negMSPR + obj.optDouble("mspr");
+            }
+        }
+        textView = findViewById(R.id.valTotalMSRPSD);
+        textView.setText(String.valueOf(totMSPR));
+        textView = findViewById(R.id.valPosMSRPSD);
+        textView.setText(String.valueOf(posMSPR));
+        textView = findViewById(R.id.valNegMSRPSD);
+        textView.setText(String.valueOf(negMSPR));
+        textView = findViewById(R.id.valTotalChangeSD);
+        textView.setText(String.valueOf(totChange));
+        textView = findViewById(R.id.valPosChangeSD);
+        textView.setText(String.valueOf(posChange));
+        textView = findViewById(R.id.valNegChangeSD);
+        textView.setText(String.valueOf(negChange));
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -835,4 +975,6 @@ public class StockDetailActivity extends AppCompatActivity {
         super.onDestroy();
         apiUpdateHandler.removeCallbacks(apiUpdateRunnable);
     }
+
+
 }

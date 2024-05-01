@@ -30,5 +30,8 @@
     <style name="GreenButton" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">@color/green</item>
     </style>
+    <style name="whiteButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/white</item>
+    </style>
 
 </resources>

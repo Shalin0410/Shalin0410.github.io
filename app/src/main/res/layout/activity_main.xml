@@ -137,4 +137,16 @@
             app:layout_constraintTop_toBottomOf="@+id/favoriteSub" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Powered by Finnhub"
+        android:textColor="@color/grey"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/contentLayout" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

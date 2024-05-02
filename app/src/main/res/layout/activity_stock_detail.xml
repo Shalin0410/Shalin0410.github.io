@@ -128,20 +128,24 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/white"
+                    app:tabIconTint="@color/tab_color_selector"
+                    app:tabIndicatorColor="@color/darkBlue"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/viewPager"
                     app:tabIndicatorFullWidth="true">
 
                     <com.google.android.material.tabs.TabItem
+                        android:id="@+id/hourlyChartIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:icon="@drawable/chart_hour" />
 
                     <com.google.android.material.tabs.TabItem
+                        android:id="@+id/historicalChartIcon"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:icon="@drawable/chart_historical" />
+                        android:icon="@drawable/chart_historical"/>
 
                 </com.google.android.material.tabs.TabLayout>
 
@@ -709,6 +713,7 @@
                 android:id="@+id/dispNewsSD"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/insightSD">
 

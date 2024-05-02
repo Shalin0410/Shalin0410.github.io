@@ -262,7 +262,7 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
                                 Toast.makeText(StockDetailActivity.this, "Not enough money to buy", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(StockDetailActivity.this, "Cannot buy non-positive shares", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StockDetailActivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -306,7 +306,7 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
                                 Toast.makeText(StockDetailActivity.this, "Not enough shares to sell", Toast.LENGTH_SHORT).show();
                             }
                         } else {
-                            Toast.makeText(StockDetailActivity.this, "Cannot sell non-positive shares", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(StockDetailActivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });

@@ -6,8 +6,10 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
-    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
+    String symbol;
+    public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity, String symbol) {
         super(fragmentActivity);
+        this.symbol = symbol;
     }
 
     @NonNull
@@ -15,11 +17,11 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position){
             case 0:
-                return new HourlyChartFragment();
+                return new HourlyChartFragment(symbol);
             case 1:
-                return new HistoricalChartFragment();
+                return new HistoricalChartFragment(symbol);
             default:
-                return new HourlyChartFragment();
+                return new HourlyChartFragment(symbol);
         }
     }
 

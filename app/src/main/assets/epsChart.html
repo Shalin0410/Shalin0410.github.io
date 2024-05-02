@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="chartContainer" style="height: 100%; width: 100%;"></div>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+        <script>
+            let symbol = Android.getSymbol();
+            (async () => {
+                console.log(symbol);
+            const data = await fetch(
+                'https://assign2shalin.wl.r.appspot.com/earnings/'+symbol
+            ).then(response => response.json());
+            console.log(data);
+            let disp = [];
+            let actualEarnings = [];
+            let estimatedEarnings = [];
+            for (let i = 0; i < data.length; i++) {
+                disp.push([data[i].period + '<br>Surpise: ' + data[i].surprise]);
+                actualEarnings.push(data[i].actual);
+                estimatedEarnings.push(data[i].estimate);
+            }
+                Highcharts.chart('chartContainer', {
+                    chart: {
+                        backgroundColor: 'white',
+                    },
+                    title: {
+                        text: 'Historical EPS Suprises',
+                    },
+                    legend: {
+                        enabled: true
+                    },
+                    xAxis: {
+                        categories: disp,
+                    },
+                    yAxis: {
+                        startOnTick: false,
+                        endOnTick: false,
+                        title: {
+                        text: 'Quaterly EPS'
+                        },
+                    },
+                    series: [{
+                        name: 'Actual',
+                        data: actualEarnings,
+                        type: 'spline'
+                    }, {
+                        name: 'Estimate',
+                        data: estimatedEarnings,
+                        type: 'spline'
+                    }]
+                });
+            })();
+        </script>
+    </body>
+</html>

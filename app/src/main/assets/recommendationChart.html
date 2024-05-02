@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <div id="chartContainer" style="height: 100%; width: 100%;"></div>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script src="https://code.highcharts.com/modules/export-data.js"></script>
+        <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+        <script>
+            let symbol = Android.getSymbol();
+            (async () => {
+            const data = await fetch(
+                'https://assign2shalin.wl.r.appspot.com/recommendation/'+symbol
+            ).then(response => response.json());
+            console.log(data);
+            let Categories = [];
+            let StrongBuy = [];
+            let Buy = [];
+            let Hold = [];
+            let Sell = [];
+            let StrongSell = [];
+            for (let i = 0; i < data.length; i++) {
+                Categories.push(data[i].period);
+                StrongBuy.push(data[i].strongBuy);
+                Buy.push(data[i].buy);
+                Hold.push(data[i].hold);
+                Sell.push(data[i].sell);
+                StrongSell.push(data[i].strongSell);
+            }
+            console.log(Categories);
+            console.log(StrongBuy);
+            console.log(Buy);
+            console.log(Hold);
+            console.log(Sell);
+            console.log(StrongSell);
+                Highcharts.chart('chartContainer', {
+                    chart: {
+                        type: 'column',
+                        backgroundColor: 'white',
+                    },
+                    title: {
+                        text: 'Recommendation Trends',
+                    },
+                    xAxis: {
+                        categories: Categories,
+                    },
+                    yAxis: {
+                        min: 0,
+                        title: {
+                            text: '#Analysis'
+                        },
+                        stackLabels: {
+                            enabled: true
+                        }
+                    },
+                    tooltip: {
+                        headerFormat: '<b>{point.x}</b><br/>',
+                        pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}'
+                    },
+                    plotOptions: {
+                        column: {
+                            stacking: 'normal',
+                            dataLabels: {
+                                enabled: false
+                            }
+                        }
+                    },
+                    series: [{
+                    type: 'column',
+                    name: 'Strong Buy',
+                    data: StrongBuy,
+                    color: 'rgb(26, 99, 52)'
+                    }, {
+                    type: 'column',
+                    name: 'Buy',
+                    data: Buy,
+                    color: 'rgb(36, 175, 81)'
+                    }, {
+                    type: 'column',
+                    name: 'Hold',
+                    data: Hold,
+                    color: 'rgb(176, 126, 40)'
+                    }, {
+                    type: 'column',
+                    name: 'Sell',
+                    data: Sell,
+                    color: 'rgb(241, 80, 83)'
+                    }, {
+                    type: 'column',
+                    name: 'Strong Sell',
+                    data: StrongSell,
+                    color: 'rgb(117, 43, 44)'
+                    }]
+                });
+            })();
+        </script>
+    </body>
+</html>

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:paddingBottom="24dp"
+    android:background="@drawable/trading_layout_dialog">
+
+    <TextView
+        android:id="@+id/newsSource"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="32dp"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/newsDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date"
+        android:textColor="@color/grey"
+        android:textStyle="bold"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        app:layout_constraintStart_toStartOf="@+id/newsSource"
+        app:layout_constraintTop_toBottomOf="@+id/newsSource" />
+
+    <View
+        android:id="@+id/newsDivider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/lightgrey"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/newsDate" />
+
+    <TextView
+        android:id="@+id/newsHeadline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="12dp"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="@color/black"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="@+id/newsDate"
+        app:layout_constraintTop_toBottomOf="@+id/newsDivider" />
+
+    <TextView
+        android:id="@+id/newsDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="12dp"
+        android:ellipsize="end"
+        android:maxLines="10"
+        android:scrollHorizontally="true"
+        android:text="News Description"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
+        android:textColor="@color/black"
+        app:layout_constraintEnd_toEndOf="@+id/newsHeadline"
+        app:layout_constraintStart_toStartOf="@+id/newsHeadline"
+        app:layout_constraintTop_toBottomOf="@+id/newsHeadline" />
+
+    <ImageView
+        android:id="@+id/googleChrome"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginStart="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/twitter"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/chrome" />
+
+    <ImageView
+        android:id="@+id/twitter"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/facebook"
+        app:layout_constraintStart_toEndOf="@+id/googleChrome"
+        app:layout_constraintTop_toBottomOf="@+id/newsDescription"
+        app:srcCompat="@drawable/twitter_x_icon" />
+
+    <ImageView
+        android:id="@+id/facebook"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_marginEnd="32dp"
+        app:layout_constraintBottom_toBottomOf="@+id/twitter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/facebook" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

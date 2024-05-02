@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                         response = response.replace("\"", "");
                         calcNetWorth = Double.parseDouble(response);
                         Log.i("myTag", "Cash Balance: " + response);
-                        String walletBalance = "$" + response;
+                        String walletBalance = "$" + String.format("%.2f", calcNetWorth);
                         cashBalance.setText(walletBalance);
                     }
                 }, new Response.ErrorListener() {

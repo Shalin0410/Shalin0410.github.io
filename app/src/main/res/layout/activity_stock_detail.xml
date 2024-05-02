@@ -148,7 +148,7 @@
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewPager"
                     android:layout_width="match_parent"
-                    android:layout_height="300dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="28dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent">
@@ -537,12 +537,12 @@
 
                     <TableRow
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="wrap_content">
 
                         <TextView
                             android:id="@+id/tableCompanyNameSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="122dp"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#E3E3E3"
                             android:padding="5dp"
@@ -551,8 +551,8 @@
 
                         <TextView
                             android:id="@+id/MSRPTitleSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="104dp"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#E3E3E3"
                             android:padding="5dp"
@@ -577,8 +577,8 @@
 
                         <TextView
                             android:id="@+id/totalTitleSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#E3E3E3"
                             android:padding="5dp"
@@ -587,8 +587,8 @@
 
                         <TextView
                             android:id="@+id/valTotalMSRPSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#F2F2F2"
                             android:padding="5dp"
@@ -596,8 +596,8 @@
 
                         <TextView
                             android:id="@+id/valTotalChangeSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#F2F2F2"
                             android:padding="5dp"
@@ -610,8 +610,8 @@
 
                         <TextView
                             android:id="@+id/positiveTitleSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#E3E3E3"
                             android:padding="5dp"
@@ -620,8 +620,8 @@
 
                         <TextView
                             android:id="@+id/valPosMSRPSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#F2F2F2"
                             android:padding="5dp"
@@ -629,8 +629,8 @@
 
                         <TextView
                             android:id="@+id/valPosChangeSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#F2F2F2"
                             android:padding="5dp"
@@ -643,8 +643,8 @@
 
                         <TextView
                             android:id="@+id/negativeTitleSD"
-                            android:layout_width="138dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#E3E3E3"
                             android:padding="5dp"
@@ -653,8 +653,8 @@
 
                         <TextView
                             android:id="@+id/valNegMSRPSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#F2F2F2"
                             android:padding="5dp"
@@ -662,8 +662,8 @@
 
                         <TextView
                             android:id="@+id/valNegChangeSD"
-                            android:layout_width="128dp"
-                            android:layout_height="wrap_content"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
                             android:layout_margin="2dp"
                             android:background="#F2F2F2"
                             android:padding="5dp"
@@ -678,7 +678,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/recommendationChart"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/insightSD">
 
@@ -691,7 +691,7 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/EPSChart"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/insightSD">
 
@@ -704,9 +704,115 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/dispNewsSD"
                 android:layout_width="match_parent"
-                android:layout_height="200dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/insightSD">
+
+                <TextView
+                    android:id="@+id/newsTitleSD"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="30dp"
+                    android:text="News"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:textColor="@color/black"
+                    android:textStyle="bold"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <androidx.cardview.widget.CardView
+                    android:id="@+id/firstNewsCardView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:layout_marginTop="15dp"
+                    app:cardCornerRadius="25dp"
+                    app:cardElevation="5dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/newsTitleSD">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:paddingBottom="16dp">
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/firstImage"
+                            android:layout_width="match_parent"
+                            android:layout_height="200dp"
+                            android:layout_marginStart="16dp"
+                            android:layout_marginEnd="16dp"
+                            app:cardCornerRadius="20dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <ImageView
+                                android:id="@+id/firstNewsImage"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_marginStart="16dp"
+                                android:layout_marginEnd="16dp"
+                                android:scaleType="centerCrop"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                tools:srcCompat="@tools:sample/backgrounds/scenic" />
+
+                        </androidx.cardview.widget.CardView>
+
+                        <TextView
+                            android:id="@+id/firstNewsSource"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:text="TextView"
+                            android:textColor="@color/grey"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="@+id/firstImage"
+                            app:layout_constraintTop_toBottomOf="@+id/firstImage" />
+
+                        <TextView
+                            android:id="@+id/firstNewsTime"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="24dp"
+                            android:layout_marginTop="16dp"
+                            android:text="TextView"
+                            android:textColor="@color/grey"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toBottomOf="@+id/firstNewsSource"
+                            app:layout_constraintStart_toEndOf="@+id/firstNewsSource"
+                            app:layout_constraintTop_toBottomOf="@+id/firstImage" />
+
+                        <TextView
+                            android:id="@+id/firstNewsTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="16dp"
+                            android:layout_marginEnd="16dp"
+                            android:text="TextView"
+                            android:textColor="@color/black"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="@+id/firstNewsSource"
+                            app:layout_constraintTop_toBottomOf="@+id/firstNewsSource" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/newsRecycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/firstNewsCardView"
+                    app:layout_constraintStart_toStartOf="parent"/>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>

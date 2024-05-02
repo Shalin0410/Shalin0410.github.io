@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -27,9 +28,11 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -50,12 +53,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StockDetailActivity extends AppCompatActivity {
+public class StockDetailActivity extends AppCompatActivity implements NewsRecyclerViewInterface {
     private Handler apiUpdateHandler = new Handler();
     private Runnable apiUpdateRunnable;
     TabLayout tabLayout;
@@ -80,15 +85,20 @@ public class StockDetailActivity extends AppCompatActivity {
     int numOfSharesTraded;
     JSONObject companyProfile;
     JSONObject companyQuote;
-    JSONArray companyNews;
+    ArrayList <JSONObject> filteredCompanyNews;
     JSONArray companyRecommendation;
     JSONObject companySentiment;
     JSONArray companyPeers;
     JSONArray companyEarnings;
     JSONObject companyCharts;
     JSONObject companyHourlyCharts;
-
+    CardView FirstNews;
+    RecyclerView newsRecyclerView;
+    RecyclerView companyPeersRecyclerView;
     RequestQueue requestQueue;
+    ImageView googleChrome;
+    ImageView facebook;
+    ImageView twitter;
     String apiURI = "https://assign2shalin.wl.r.appspot.com";
 
     @Override
@@ -121,7 +131,7 @@ public class StockDetailActivity extends AppCompatActivity {
         }
         tabLayout = findViewById(R.id.tabLayout);
         viewPager2 = findViewById(R.id.viewPager);
-        viewPagerAdapter = new ViewPagerAdapter(this);
+        viewPagerAdapter = new ViewPagerAdapter(this, stockSymbol);
         viewPager2.setAdapter(viewPagerAdapter);
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -318,6 +328,11 @@ public class StockDetailActivity extends AppCompatActivity {
         setStats();
         setAbout();
         setInsights();
+        setRecommendation();
+        setEarnings();
+        setFirstImageNews();
+        setNewsRecyclerView();
+        setCompanyPeersRecyclerView();
 
         findViewById(R.id.contentSD).setVisibility(View.VISIBLE);
         findViewById(R.id.progressBarSD).setVisibility(View.GONE);
@@ -408,7 +423,20 @@ public class StockDetailActivity extends AppCompatActivity {
     }
     private void setAbout() {
         TextView textView = findViewById(R.id.valIPOSD);
-        textView.setText(companyProfile.optString("ipo", ""));
+        String date = companyProfile.optString("ipo", "");
+        if (date.isEmpty()) {
+            date = "";
+        } else {
+            SimpleDateFormat originalFormat = new SimpleDateFormat("yyyy-MM-dd");
+            SimpleDateFormat targetFormat = new SimpleDateFormat("MM-dd-yyyy");
+            try {
+                Date parsedDate = originalFormat.parse(date);
+                date = targetFormat.format(parsedDate);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        textView.setText(date);
         Log.i("StockDetailActivity", "IPO Date: " + companyProfile.optString("ipo", ""));
         textView = findViewById(R.id.valIndustrySD);
         textView.setText(companyProfile.optString("finnhubIndustry", ""));
@@ -435,14 +463,13 @@ public class StockDetailActivity extends AppCompatActivity {
         }
         Log.i("StockDetailActivity", "Peers: " + list);
     }
-
     private void setInsights() {
         double totMSPR = 0.0;
         double posMSPR = 0.0;
         double negMSPR = 0.0;
-        int totChange = 0;
-        int posChange = 0;
-        int negChange = 0;
+        double totChange = 0.0;
+        double posChange = 0.0;
+        double negChange = 0.0;
         TextView textView = findViewById(R.id.tableCompanyNameSD);
         textView.setText(companyProfile.optString("name", ""));
         JSONArray data = companySentiment.optJSONArray("data");
@@ -464,20 +491,72 @@ public class StockDetailActivity extends AppCompatActivity {
             }
         }
         textView = findViewById(R.id.valTotalMSRPSD);
-        textView.setText(String.valueOf(totMSPR));
+        textView.setText(String.format("%.2f", totMSPR));
         textView = findViewById(R.id.valPosMSRPSD);
-        textView.setText(String.valueOf(posMSPR));
+        textView.setText(String.format("%.2f", posMSPR));
         textView = findViewById(R.id.valNegMSRPSD);
-        textView.setText(String.valueOf(negMSPR));
+        textView.setText(String.format("%.2f", negMSPR));
         textView = findViewById(R.id.valTotalChangeSD);
-        textView.setText(String.valueOf(totChange));
+        textView.setText(String.format("%.2f", totChange));
         textView = findViewById(R.id.valPosChangeSD);
-        textView.setText(String.valueOf(posChange));
+        textView.setText(String.format("%.2f", posChange));
         textView = findViewById(R.id.valNegChangeSD);
-        textView.setText(String.valueOf(negChange));
+        textView.setText(String.format("%.2f", negChange));
     }
+    private void setRecommendation() {
+        WebView webView = findViewById(R.id.recommendatinTrend);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new WebAppInterface(this, stockSymbol), "Android");
+        //webView.loadDataWithBaseURL(null, chartHTML, "text/html", "UTF-8", null);
+        webView.loadUrl("file:///android_asset/recommendationChart.html");
+    }
+    private void setEarnings() {
+        WebView webView = findViewById(R.id.historicalEPSSurprises);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.addJavascriptInterface(new WebAppInterface(this, stockSymbol), "Android");
+        //webView.loadDataWithBaseURL(null, chartHTML, "text/html", "UTF-8", null);
+        webView.loadUrl("file:///android_asset/epsChart.html");
+    }
+    private void setFirstImageNews() {
+        FirstNews = (CardView) findViewById(R.id.firstNewsCardView);
+        JSONObject firstNews = filteredCompanyNews.get(0);
+        ImageView imageView = findViewById(R.id.firstNewsImage);
+        String imageURL = firstNews.optString("image", "");
+        if (imageURL != null) {
+            Picasso.get().load(imageURL).into(imageView);
+        }
 
+        TextView textView = findViewById(R.id.firstNewsSource);
+        textView.setText(firstNews.optString("source", ""));
 
+        textView = findViewById(R.id.firstNewsTime);
+        long datetime = firstNews.optInt("datetime");
+        Date pastDate = new Date(datetime * 1000);
+        Date currentDate = new Date();
+        long hoursPassed = (currentDate.getTime() - pastDate.getTime()) / (60 * 60 * 1000);
+        hoursPassed = Math.abs(hoursPassed);
+        textView.setText(String.valueOf(hoursPassed) + " hours ago");
+
+        textView = findViewById(R.id.firstNewsTitle);
+        textView.setText(firstNews.optString("headline", ""));
+        FirstNews.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("StockDetailActivity", "First News Clicked");
+                performNewsDialogue(firstNews);
+            }
+        });
+    }
+    private void setNewsRecyclerView() {
+        newsRecyclerView = findViewById(R.id.newsRecycler);
+        List<JSONObject> newsList = filteredCompanyNews.subList(1, filteredCompanyNews.size());
+        NewsAdapter newsAdapter = new NewsAdapter(this, newsList, this);
+        newsRecyclerView.setAdapter(newsAdapter);
+        newsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
+    private void setCompanyPeersRecyclerView(){
+        companyPeersRecyclerView = findViewById(R.id.valPeersSD);
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         Log.i("StockDetailActivity", "onOptionsItemSelected");
@@ -535,8 +614,63 @@ public class StockDetailActivity extends AppCompatActivity {
 //        return true;
 //    }
 
+    private void performNewsDialogue(JSONObject newsItem) {
+        final Dialog dialog = new Dialog(StockDetailActivity.this);
+        dialog.setContentView(R.layout.news_dialogue);
+        TextView textView = (TextView) dialog.findViewById(R.id.newsSource);
+        String title = newsItem.optString("source");
+        textView.setText(title);
 
+        textView = (TextView) dialog.findViewById(R.id.newsDate);
+        long datetime = newsItem.optInt("datetime");
+        Date newsDate = new Date(datetime * 1000);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+        String formattedDate = dateFormat.format(newsDate);
+        textView.setText(formattedDate);
+        textView = (TextView) dialog.findViewById(R.id.newsHeadline);
+        textView.setText(newsItem.optString("headline"));
+        textView = (TextView) dialog.findViewById(R.id.newsDescription);
+        textView.setText(newsItem.optString("summary"));
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int width = metrics.widthPixels;
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.getWindow().setLayout(width, WindowManager.LayoutParams.WRAP_CONTENT);
+        dialog.show();
+        googleChrome = (ImageView) dialog.findViewById(R.id.googleChrome);
+        facebook = (ImageView) dialog.findViewById(R.id.facebook);
+        twitter = (ImageView) dialog.findViewById(R.id.twitter);
+        googleChrome.setOnClickListener(new View.OnClickListener() {
+            String webURL = newsItem.optString("url");
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(webURL));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        facebook.setOnClickListener(new View.OnClickListener() {
+            String webURL = "https://www.facebook.com/sharer/sharer.php?u=" + newsItem.optString("url");
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(webURL));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+        twitter.setOnClickListener(new View.OnClickListener() {
+            String webURL = "https://twitter.com/intent/tweet?text=" + newsItem.optString("headline") + "&url=" + newsItem.optString("url");
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(webURL));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
 
+    }
     private void fetchData() {
         fetchCompanyProfile();
     }
@@ -584,25 +718,17 @@ public class StockDetailActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONArray response) {
                         Log.i("StockDetailActivity", "Response from company news: " + response.toString());
-                        companyNews = response;
-                        fetchCompanyRecommendation();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
-                    }
-                });
-        requestQueue.add(request);
-    }
-    private void fetchCompanyRecommendation() {
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, apiURI + "/recommendation/" + stockSymbol, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.i("StockDetailActivity", "Response from company recommendation: " + response.toString());
-                        companyRecommendation = response;
+                        filteredCompanyNews = new ArrayList<>();
+                        JSONObject newsItem;
+                        int count = 0;
+                        for (int i = 0; i < response.length(); i++) {
+                            newsItem = response.optJSONObject(i);
+                            if (newsItem.has("image") && !response.optJSONObject(i).optString("image", "").isEmpty() && count <= 20) {
+                                filteredCompanyNews.add(newsItem);
+                                count++;
+                            }
+                        }
+                        Log.i("StockDetailActivity", "Filtered Company News: " + filteredCompanyNews);
                         fetchCompanySentiment();
                     }
                 },
@@ -614,6 +740,24 @@ public class StockDetailActivity extends AppCompatActivity {
                 });
         requestQueue.add(request);
     }
+//    private void fetchCompanyRecommendation() {
+//        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, apiURI + "/recommendation/" + stockSymbol, null,
+//                new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray response) {
+//                        Log.i("StockDetailActivity", "Response from company recommendation: " + response.toString());
+//                        companyRecommendation = response;
+//                        fetchCompanySentiment();
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
+//                    }
+//                });
+//        requestQueue.add(request);
+//    }
     private void fetchCompanySentiment() {
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/sentiment/" + stockSymbol, null,
                 new Response.Listener<JSONObject>() {
@@ -639,60 +783,6 @@ public class StockDetailActivity extends AppCompatActivity {
                     public void onResponse(JSONArray response) {
                         Log.i("StockDetailActivity", "Response from company peers: " + response.toString());
                         companyPeers = response;
-                        fetchCompanyEarnings();
-                        }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
-                    }
-                });
-        requestQueue.add(request);
-    }
-    private void fetchCompanyEarnings() {
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, apiURI + "/earnings/" + stockSymbol, null,
-                new Response.Listener<JSONArray>() {
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        Log.i("StockDetailActivity", "Response from company earnings: " + response.toString());
-                        companyEarnings = response;
-                        fetchCompanyCharts();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
-                    }
-                });
-        requestQueue.add(request);
-    }
-    private void fetchCompanyCharts() {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/charts/" + stockSymbol, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("StockDetailActivity", "Response from company charts: " + response.toString());
-                        companyCharts = response;
-                        fetchCompanyHourlyCharts();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
-                    }
-                });
-        requestQueue.add(request);
-    }
-    private void fetchCompanyHourlyCharts() {
-        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/hourlyCharts/" + stockSymbol, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.i("StockDetailActivity", "Response from company hourly charts: " + response.toString());
-                        companyHourlyCharts = response;
                         fetchIsFavorite();
                         }
                 },
@@ -704,6 +794,60 @@ public class StockDetailActivity extends AppCompatActivity {
                 });
         requestQueue.add(request);
     }
+//    private void fetchCompanyEarnings() {
+//        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, apiURI + "/earnings/" + stockSymbol, null,
+//                new Response.Listener<JSONArray>() {
+//                    @Override
+//                    public void onResponse(JSONArray response) {
+//                        Log.i("StockDetailActivity", "Response from company earnings: " + response.toString());
+//                        companyEarnings = response;
+//                        fetchIsFavorite();
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.i("StockDetailActivity", "Company Earnings Error: " + error.getMessage());
+//                    }
+//                });
+//        requestQueue.add(request);
+//    }
+//    private void fetchCompanyCharts() {
+//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/charts/" + stockSymbol, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        Log.i("StockDetailActivity", "Response from company charts: " + response.toString());
+//                        companyCharts = response;
+//                        fetchCompanyHourlyCharts();
+//                    }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
+//                    }
+//                });
+//        requestQueue.add(request);
+//    }
+//    private void fetchCompanyHourlyCharts() {
+//        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/hourlyCharts/" + stockSymbol, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        Log.i("StockDetailActivity", "Response from company hourly charts: " + response.toString());
+//                        companyHourlyCharts = response;
+//                        fetchIsFavorite();
+//                        }
+//                },
+//                new Response.ErrorListener() {
+//                    @Override
+//                    public void onErrorResponse(VolleyError error) {
+//                        Log.i("StockDetailActivity", "Error: " + error.getMessage());
+//                    }
+//                });
+//        requestQueue.add(request);
+//    }
     private void fetchIsFavorite() {
         JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, apiURI + "/watchlist", null,
                 new Response.Listener<JSONArray>() {
@@ -977,4 +1121,12 @@ public class StockDetailActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onNewsItemClick(int position) {
+        Log.i("StockDetailActivity", "onNewsItemClick");
+        Log.i("StockDetailActivity", "position: " + position);
+        Log.i("StockDetailActivity", "filteredCompanyNews.size(): " + filteredCompanyNews.size());
+        Log.i("StockDetailActivity", "filteredCompanyNews.get(position): " + filteredCompanyNews.get(position+1));
+        performNewsDialogue(filteredCompanyNews.get(position+1));
+    }
 }

@@ -1,11 +1,14 @@
 package io.github.stockapplication;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -66,6 +69,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     MenuItem searchItem;
     boolean firstTime = true;
     ArrayList<String> suggestions;
+    @SuppressLint("RestrictedApi")
+    SearchView.SearchAutoComplete autoComplete;
 
 
     @Override
@@ -176,6 +181,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                                             }
                                             if (count == portfolioStocks.size()) {
                                                 adapter = new StockAdapter(MainActivity.this, portfolioStocks,MainActivity.this, "portfolio");
+                                                ItemTouchHelper.Callback callback = new ItemMovePortfolioCallback(adapter);
+                                                ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+                                                touchHelper.attachToRecyclerView(portfolioRecyclerView);
                                                 portfolioRecyclerView.setAdapter(adapter);
                                                 portfolioRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
                                                 String displayNetWorth = "$" + String.format("%.2f", calcNetWorth);
@@ -303,21 +311,37 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
         return true;
     }
 
+    @SuppressLint("RestrictedApi")
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
         if (spinner.getVisibility() == View.GONE) {
+            getMenuInflater().inflate(R.menu.action_buttons, menu);
             searchItem = menu.findItem(R.id.action_search_icon);
             searchItem.setVisible(true);
             SearchView searchView = (SearchView) searchItem.getActionView();
-            if (searchView != null) {
+            autoComplete = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+            autoComplete.setThreshold(0);
+            if (autoComplete != null) {
+                autoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        String query = (String) parent.getItemAtPosition(position);
+                        String symbol = query.substring(0, query.indexOf(" | "));
+                        Log.i("myTag", "Query: " + symbol);
+                        Intent intent = new Intent(MainActivity.this, StockDetailActivity.class);
+                        intent.putExtra("symbol", symbol);
+                        firstTime = false;
+                        startActivity(intent);
+                    }
+                });
                 searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                     @Override
                     public boolean onQueryTextSubmit(String query) {
-                        Log.i("myTag", "Query: " + query);
+                        String symbol = query.substring(0, query.indexOf(" | "));
+                        Log.i("myTag", "Query: " + symbol);
                         Intent intent = new Intent(MainActivity.this, StockDetailActivity.class);
-                        intent.putExtra("symbol", query);
-                        intent.putExtra("favorites", favoriteStocks);
+                        intent.putExtra("symbol", symbol);
                         firstTime = false;
                         startActivity(intent);
                         return true;
@@ -351,15 +375,15 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                                 JSONObject stock = response.getJSONObject(i);
                                 String symbol = stock.getString("symbol");
                                 String type = stock.getString("type");
-
-                                if (!symbol.contains(".") && "Common Stock".equals(type)) {
-                                    suggestions.add(symbol + " | " + stock.getString("description"));
-                                }
+                                suggestions.add(symbol + " | " + stock.getString("description"));
                             }
                             Log.i("myTag", "Suggestions: " + suggestions);
                         } catch (JSONException e) {
                             Log.i("myTag", "Error: " + e.getMessage());
                         }
+                        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, suggestions);
+                        autoComplete.setAdapter(adapter);
+                        adapter.notifyDataSetChanged();
                     }
                 }, new Response.ErrorListener() {
                 @Override

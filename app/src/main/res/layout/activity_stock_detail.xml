@@ -486,12 +486,16 @@
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/valPeersSD"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
+                    android:layout_marginStart="140dp"
+                    android:layout_marginEnd="30dp"
+
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     app:layout_constraintBottom_toBottomOf="@+id/peersTitleSD"
                     app:layout_constraintStart_toStartOf="@+id/valWebpageSD"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/peersTitleSD" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

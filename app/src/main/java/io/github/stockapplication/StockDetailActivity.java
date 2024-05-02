@@ -1,6 +1,7 @@
 package io.github.stockapplication;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -60,7 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StockDetailActivity extends AppCompatActivity implements NewsRecyclerViewInterface {
+public class StockDetailActivity extends AppCompatActivity implements NewsRecyclerViewInterface, CompanyPeersRecyclerViewInterface {
     private Handler apiUpdateHandler = new Handler();
     private Runnable apiUpdateRunnable;
     TabLayout tabLayout;
@@ -121,6 +122,7 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
         findViewById(R.id.progressBarSD).setVisibility(View.VISIBLE);
         requestQueue = Volley.newRequestQueue(this);
         stockSymbol = getIntent().getStringExtra("symbol");
+        Log.i("StockDetailActivity", "Stock Symbol: " + stockSymbol);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
@@ -342,7 +344,8 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
         if (companyProfile != null) {
             ImageView imageView = findViewById(R.id.companyLogoSD);
             String imageURL = companyProfile.optString("logo", "");
-            if (imageURL != null) {
+            Log.i("StockDetailActivity", "Image URL: " + imageURL);
+            if (imageURL != null && !imageURL.isEmpty()) {
                 Picasso.get().load(imageURL).into(imageView);
             }
             TextView textView = findViewById(R.id.symbolSD);
@@ -556,6 +559,9 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
     }
     private void setCompanyPeersRecyclerView(){
         companyPeersRecyclerView = findViewById(R.id.valPeersSD);
+        CompanyPeersAdapter companyPeersAdapter = new CompanyPeersAdapter((Context) this, companyPeers, (CompanyPeersRecyclerViewInterface) this);
+        companyPeersRecyclerView.setAdapter(companyPeersAdapter);
+        companyPeersRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -909,7 +915,7 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
                             try {
                                 Log.i("StockDetailActivity", "Individial DB Stock: " + response.getJSONObject(i));
                                 JSONObject stock = response.getJSONObject(i);
-                                if (stockSymbol.equals(stock.getString("symbols"))){
+                                if (stockSymbol.equals(stock.optString("symbols",""))){
                                     quantity = stock.getInt("quantity");
                                     totalCost = Double.parseDouble(stock.getString("totalCost"));
                                     avgCost = Double.parseDouble(stock.getString("avgCost"));
@@ -1129,4 +1135,16 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
         Log.i("StockDetailActivity", "filteredCompanyNews.get(position): " + filteredCompanyNews.get(position+1));
         performNewsDialogue(filteredCompanyNews.get(position+1));
     }
+
+    @Override
+    public void onPeersItemClick(int position) {
+        Log.i("StockDetailActivity", "onCompanyPeersClick");
+        Log.i("StockDetailActivity", "position: " + position);
+        Log.i("StockDetailActivity", "companyPeers: " + companyPeers.optString(position));
+        Intent intent = new Intent(this, StockDetailActivity.class);
+        intent.putExtra("symbol", companyPeers.optString(position));
+        startActivity(intent);
+    }
+
+
 }

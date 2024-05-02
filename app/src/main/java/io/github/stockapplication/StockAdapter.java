@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> implements ItemMoveCallback.ItemTouchHelperContract{
+public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHolder> implements ItemMovePortfolioCallback.ItemTouchHelperContract{
     private final RecyclerViewInterface recyclerViewInterface;
     Context context;
     ArrayList<Stock> portfolioList;
@@ -90,12 +90,12 @@ public class StockAdapter extends RecyclerView.Adapter<StockAdapter.StockViewHol
     }
 
     @Override
-    public void onRowSelected(FavoriteStockAdapter.FavoriteStockViewHolder myViewHolder) {
+    public void onRowSelected(StockViewHolder myViewHolder) {
         myViewHolder.itemView.setBackgroundColor(Color.WHITE);
     }
 
     @Override
-    public void onRowClear(FavoriteStockAdapter.FavoriteStockViewHolder myViewHolder) {
+    public void onRowClear(StockViewHolder myViewHolder) {
         myViewHolder.itemView.setBackgroundColor(Color.WHITE);
     }
 

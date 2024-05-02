@@ -164,6 +164,7 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
                 Log.i("StockDetailActivity", "Updating Company Profile");
                 fetchCompanyQuote();
                 apiUpdateHandler.postDelayed(this, 15000);
+
             }
         };
         apiUpdateHandler.post(apiUpdateRunnable);

@@ -2,7 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const cors = require('cors');
 const app = express();
-app.use(cors({ origin: 'http://localhost:4200', methods: 'GET,POST,DELETE,PUT' }));
+app.use(cors());
 app.use(express.static('my-app/dist/my-app/browser'));
 const port = process.env.PORT || 8080;
 const API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0';
@@ -305,7 +305,7 @@ app.get('/portfolio', async (req, res) => {
   try {
     // Find the documents and convert them to an array
     const docs = await portfolio.find({}).toArray();
-    const symbols = docs.map(doc => ({ symbols: doc.symbols, name: doc.name, quantity: doc.quantity, totalCost: doc.totalCost}));
+    const symbols = docs.map(doc => ({ symbols: doc.symbols, name: doc.name, quantity: doc.quantity, totalCost: doc.totalCost, avgCost: doc.avgCost}));
     console.log('Retrieved portfolio:', symbols);
     res.status(200).json(symbols);
   } catch (err) {

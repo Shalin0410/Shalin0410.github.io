@@ -571,6 +571,9 @@ public class StockDetailActivity extends AppCompatActivity implements NewsRecycl
         Log.i("StockDetailActivity", "R.id.action_favorite: " + R.id.action_favorite);
         int itemId = item.getItemId();
         if (itemId == android.R.id.home) {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
             finish();
             return true;
         } else if (itemId == R.id.action_favorite) {

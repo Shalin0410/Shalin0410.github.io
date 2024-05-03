@@ -2,6 +2,7 @@ package io.github.stockapplication;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     private RecyclerView favoritesRecyclerView;
     private FavoriteStockAdapter favAdapter;
     private String apiURI = "https://assign2shalin.wl.r.appspot.com";
-    private double calcNetWorth = 0;
+    private double calcNetWorth = 0.0;
 
     double latestQuote = 0.0;
     double changeInPrice = 0.0;
@@ -69,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
     MenuItem searchItem;
     boolean firstTime = true;
     ArrayList<String> suggestions;
+    TextView finnHub;
     @SuppressLint("RestrictedApi")
     SearchView.SearchAutoComplete autoComplete;
 
@@ -115,6 +117,19 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 //        portfolioRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 //        spinner.setVisibility(View.GONE);
 //        contentLayout.setVisibility(View.VISIBLE);
+        finnHub = (TextView) findViewById(R.id.finnHub);
+        finnHub.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String webURL = "https://finnhub.io";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(webURL));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        });
+
+
     }
 
     private void fetchMongoDBData(RequestQueue requestQueue) {
@@ -132,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                     @Override
                     public void onResponse(String response) {
                         response = response.replace("\"", "");
-                        calcNetWorth = Double.parseDouble(response);
+                        calcNetWorth = calcNetWorth + Double.parseDouble(response);
                         Log.i("myTag", "Cash Balance: " + response);
                         String walletBalance = "$" + String.format("%.2f", calcNetWorth);
                         cashBalance.setText(walletBalance);
@@ -164,39 +179,53 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                             } catch (JSONException e) {
                                 throw new RuntimeException(e);
                             }
+                            Log.i("myTag", "Portfolio Stocks Inside Loop: " + portfolioStocks);
                         }
-                        for (Stock stock : portfolioStocks) {
-                            JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/quote/" + stock.getSymbol(), null,
-                                    new Response.Listener<JSONObject>() {
-                                        @Override
-                                        public void onResponse(JSONObject response) {
-                                            count++;
-                                            Log.i("myTag", "Company Quote: " + response);
-                                            try {
-                                                latestQuote = response.getDouble("c");
-                                                stock.setLatestQuote(latestQuote);
-                                                calcNetWorth += (latestQuote * stock.getQuantity());
-                                            } catch (JSONException e) {
-                                                throw new RuntimeException(e);
+                        Log.i("myTag", "Portfolio Stock Out Loop: " + portfolioStocks);
+                        if (portfolioStocks.size() > 0) {
+
+                            for (Stock stock : portfolioStocks) {
+                                JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, apiURI + "/quote/" + stock.getSymbol(), null,
+                                        new Response.Listener<JSONObject>() {
+                                            @Override
+                                            public void onResponse(JSONObject response) {
+                                                count++;
+                                                Log.i("myTag", "Company Quote: " + response);
+                                                try {
+                                                    latestQuote = response.getDouble("c");
+                                                    stock.setLatestQuote(latestQuote);
+                                                    calcNetWorth += (latestQuote * stock.getQuantity());
+
+                                                } catch (JSONException e) {
+                                                    throw new RuntimeException(e);
+                                                }
+                                                Log.i("myTag", "Net Worth: " + calcNetWorth);
+                                                Log.i("myTag", "Count: " + count + " Size: " + portfolioStocks.size());
+                                                if (count == portfolioStocks.size()) {
+                                                    adapter = new StockAdapter(MainActivity.this, portfolioStocks, MainActivity.this, "portfolio");
+                                                    ItemTouchHelper.Callback callback = new ItemMovePortfolioCallback(adapter);
+                                                    ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+                                                    touchHelper.attachToRecyclerView(portfolioRecyclerView);
+                                                    portfolioRecyclerView.setAdapter(adapter);
+                                                    portfolioRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                                                    String displayNetWorth = "$" + String.format("%.2f", calcNetWorth);
+                                                    netWorth.setText(displayNetWorth);
+                                                }
                                             }
-                                            if (count == portfolioStocks.size()) {
-                                                adapter = new StockAdapter(MainActivity.this, portfolioStocks,MainActivity.this, "portfolio");
-                                                ItemTouchHelper.Callback callback = new ItemMovePortfolioCallback(adapter);
-                                                ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
-                                                touchHelper.attachToRecyclerView(portfolioRecyclerView);
-                                                portfolioRecyclerView.setAdapter(adapter);
-                                                portfolioRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-                                                String displayNetWorth = "$" + String.format("%.2f", calcNetWorth);
-                                                netWorth.setText(displayNetWorth);
-                                            }
-                                        }
                                         }, new Response.ErrorListener() {
-                                        @Override
-                                        public void onErrorResponse(VolleyError error) {
-                                            Log.i("myTag", "Error: " + error.getMessage());
-                                        }
-                            });
-                            requestQueue.add(request);
+                                    @Override
+                                    public void onErrorResponse(VolleyError error) {
+                                        Log.i("myTag", "Error: " + error.getMessage());
+                                    }
+                                });
+                                requestQueue.add(request);
+                            }
+                        } else {
+                            adapter = new StockAdapter(MainActivity.this, portfolioStocks, MainActivity.this, "portfolio");
+                            portfolioRecyclerView.setAdapter(adapter);
+                            portfolioRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                            String displayNetWorth = "$" + String.format("%.2f", calcNetWorth);
+                            netWorth.setText(displayNetWorth);
                         }
                         getFavouritesStocksMongoDB(requestQueue);
                     }
@@ -252,10 +281,6 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
 
                                                 favoritesRecyclerView.setAdapter(favAdapter);
                                                 favoritesRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-                                                spinner.setVisibility(View.GONE);
-                                                contentLayout.setVisibility(View.VISIBLE);
-                                                invalidateOptionsMenu();
-                                                enableSwipeToDelete(requestQueue);
                                             }
                                         }
                                     }, new Response.ErrorListener() {
@@ -266,6 +291,10 @@ public class MainActivity extends AppCompatActivity implements RecyclerViewInter
                             });
                             requestQueue.add(request);
                         }
+                        spinner.setVisibility(View.GONE);
+                        contentLayout.setVisibility(View.VISIBLE);
+                        invalidateOptionsMenu();
+                        enableSwipeToDelete(requestQueue);
                     }
                 }, new Response.ErrorListener() {
             @Override

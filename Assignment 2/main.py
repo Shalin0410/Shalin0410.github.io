@@ -5,7 +5,7 @@ from dateutil.relativedelta import relativedelta
 import os
 import requests
 
-API_KEY = 'cn961jhr01qoee99obggcn961jhr01qoee99obh0'
+API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0'
 
 app = Flask(__name__, static_folder='static', template_folder='templates')
 app.debug = True

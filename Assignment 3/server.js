@@ -5,7 +5,7 @@ const app = express();
 app.use(cors());
 app.use(express.static('my-app/dist/my-app/browser'));
 const port = process.env.PORT || 8080;
-const API_KEY = 'co271lhr01qvggedsuogco271lhr01qvggedsup0';
+const API_KEY = process.env.MY_API_KEY;
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = 'mongodb+srv://shalinshah1998:vKkqoTACCiUfLSUm@stockapplication.clfuiyi.mongodb.net/?retryWrites=true&w=majority&appName=stockApplication';

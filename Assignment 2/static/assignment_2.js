@@ -236,7 +236,7 @@ function displayStockSummary() {
             </tr>
         </table>
     </div>
-    <div style="text-align: center" class="recommendation>Recommendation Trends</div>`;
+    <div style="text-align: center" class="recommendation">Recommendation Trends</div>`;
     tabContents['stockSummaryInfo'] = stockSummary.innerHTML;
 }
 

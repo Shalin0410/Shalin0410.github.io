@@ -27,6 +27,7 @@
     "highcharts": "^11.4.0",
     "highcharts-angular": "^4.0.0",
     "install": "^0.13.0",
+    "my-app": "file:",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.3"

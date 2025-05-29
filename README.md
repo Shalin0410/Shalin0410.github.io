@@ -44,3 +44,15 @@ Create a full-stack responsive stock market web app using Angular for the fronte
 **Technologies**: Node.js, Express.js, Angular, Bootstrap, MongoDB Atlas, HighCharts, Finnhub API, Polygon.io  
 **Output**: Cloud-hosted full-stack application
 
+
+---
+
+## 📱 [Assignment 4: Android Stock Trading App (Java + Node.js)]
+
+**Description**:  
+Built a feature-rich Android app using Java and Android Studio that replicates the functionality of the web-based trading app. Integrated real-time stock APIs (Finnhub, Polygon.io) via a Node.js backend, and implemented portfolio management, auto-complete search, chart visualization, and swipe gestures. Data persistence handled with MongoDB Atlas.  
+**Demo Video**: [https://www.youtube.com/watch?v=uCtQjXHZmy0]
+
+**Technologies**: Java, Android Studio, Node.js, MongoDB, HighCharts, REST APIs  
+**Output**: Stock trading app with mobile UI
+

@@ -8,7 +8,6 @@ Welcome to the repository of web development assignments. Click the links below 
 
 **Description**:  
 Recreate a given web page layout using only HTML and CSS. This assignment focuses on mastering the ability to replicate existing web designs by directly composing HTML and CSS without using page builders or frameworks. You will:
-- Use 4 provided images and create one additional graphic.
 - Implement a navigation system with internal anchor links pointing to sections within a secondary HTML file.
 - Reproduce layout, styling, and content structure based on screenshots.
 - Ensure compatibility and proper layout rendering on Firefox.

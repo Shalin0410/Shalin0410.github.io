@@ -17,7 +17,7 @@ Recreate a given web page layout using only HTML and CSS. This assignment focuse
 
 ---
 
-## 🐍 [Assignment 2: Python Flask Stock Search Web App](#)
+## 🐍 [Assignment 2: Python Flask Stock Search Web App](https://assign2shal.wl.r.appspot.com/)
 
 **Description**:  
 Develop a stock information search web app with a backend powered by Python and Flask, hosted on a cloud platform (GCP, AWS, or Azure). The app allows users to:
@@ -31,7 +31,7 @@ Develop a stock information search web app with a backend powered by Python and 
 
 ---
 
-## 🌐 [Assignment 3: Node.js Stock App with Angular and MongoDB](#)
+## 🌐 [Assignment 3: Node.js Stock App with Angular and MongoDB](https://assign2shalin.wl.r.appspot.com/)
 
 **Description**:  
 Create a full-stack responsive stock market web app using Angular for the frontend and Node.js with Express for the backend. Deployed to a cloud platform, the app includes:
